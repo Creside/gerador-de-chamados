@@ -2,7 +2,8 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Suporte Técnico - Cloud Sync v9.1</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Suporte Técnico - Cloud Sync v9.2</title>
     <style>
         :root {
             --bg-body: #121212; --bg-container: #1e1e1e; --bg-input: #2d2d2d;
@@ -12,7 +13,7 @@
         }
 
         body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg-body); color: var(--text-primary); display: flex; justify-content: center; padding: 20px; align-items: flex-start; min-height: 100vh; margin: 0; box-sizing: border-box; }
-        .container { background: var(--bg-container); padding: 25px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); width: 100%; max-width: 600px; border: 1px solid var(--border-color); }
+        .container { background: var(--bg-container); padding: 25px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.5); width: 100%; max-width: 600px; border: 1px solid var(--border-color); box-sizing: border-box; }
         
         h2 { color: var(--accent-blue); margin: 0 0 15px 0; font-size: 20px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         label { display: block; margin-top: 12px; font-weight: 600; color: var(--text-secondary); font-size: 13px; }
@@ -42,6 +43,15 @@
         /* Controles de Tela */
         #loginScreen, #appScreen, #mainScreen, #settingsScreen { display: none; }
         #statusMsg { text-align: center; margin-top: 10px; font-size: 12px; font-weight: bold; height: 15px; }
+
+        /* OTIMIZAÇÃO PARA TELAS PEQUENAS (CELULARES) */
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .container { padding: 15px; }
+            h2 { font-size: 18px; flex-direction: column; align-items: flex-start; gap: 10px; }
+            h2 div { width: 100%; display: flex; justify-content: space-between; }
+            .btn-group { grid-template-columns: 1fr 1fr; }
+        }
     </style>
 </head>
 <body>
