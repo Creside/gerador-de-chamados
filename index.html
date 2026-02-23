@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Suporte Técnico - Cloud Sync v9.2</title>
+    <title>Suporte Técnico - Cloud Sync v9.3</title>
     <style>
         :root {
             --bg-body: #121212; --bg-container: #1e1e1e; --bg-input: #2d2d2d;
@@ -40,11 +40,8 @@
         .btn-action-edit { color: var(--accent-blue); cursor: pointer; font-weight: bold; border: none; background: none; }
         .btn-action-del { color: var(--accent-red); cursor: pointer; font-weight: bold; border: none; background: none; }
 
-        /* Controles de Tela */
         #loginScreen, #appScreen, #mainScreen, #settingsScreen { display: none; }
-        #statusMsg { text-align: center; margin-top: 10px; font-size: 12px; font-weight: bold; height: 15px; }
-
-        /* OTIMIZAÇÃO PARA TELAS PEQUENAS (CELULARES) */
+        
         @media (max-width: 600px) {
             body { padding: 10px; }
             .container { padding: 15px; }
@@ -59,35 +56,29 @@
 <div class="container" id="loginScreen" style="display: block;">
     <h2 style="justify-content: center; border-bottom: none;">🔒 Acesso Restrito</h2>
     <p style="text-align: center; color: var(--text-secondary); font-size: 13px; margin-top: -10px;">Entre com suas credenciais do Firebase</p>
-    
-    <label>E-mail</label>
-    <input type="email" id="emailInput" placeholder="seu@email.com">
-    
-    <label>Senha</label>
-    <input type="password" id="senhaInput" placeholder="Sua senha secreta">
-    
+    <label>E-mail</label><input type="email" id="emailInput" placeholder="seu@email.com">
+    <label>Senha</label><input type="password" id="senhaInput" placeholder="Sua senha secreta">
     <button class="btn-login" onclick="fazerLogin()">Entrar no Sistema</button>
     <div id="loginMsg" style="text-align: center; margin-top: 15px; font-size: 13px; color: var(--accent-red);"></div>
 </div>
 
 <div class="container" id="appScreen">
-    
     <div id="mainScreen">
-        <h2>
-            Scripts Gerador
-            <div>
-                <button class="btn-logout" onclick="fazerLogout()">Sair</button>
-                <button class="btn-settings" onclick="showSettings()">⚙ Configurações</button>
-            </div>
-        </h2>
+        <h2>Scripts Gerador <div><button class="btn-logout" onclick="fazerLogout()">Sair</button><button class="btn-settings" onclick="showSettings()">⚙ Configurações</button></div></h2>
         
         <div style="display:flex; gap:8px;">
             <div style="width:80px;"><label>Trat.</label><select id="tratamento"><option>Sr.</option><option>Sra.</option></select></div>
             <div style="flex-grow:1;"><label>Usuário</label><input type="text" id="usuario" placeholder="Nome do solicitante"></div>
         </div>
         
-        <label>Ocorrência / Chamado</label><input type="text" id="problema" placeholder="Ex: Problema de Hardware">
-        <label>Modelo Rápido</label><select id="templateSelect" onchange="carregarCamposDinamicos()"><option value="">-- Carregando da Nuvem... --</option></select>
+        <label>Tipo de Atendimento</label>
+        <select id="tipoAtendimento">
+            <option value="problema">🔧 Problema / Manutenção</option>
+            <option value="instalacao">📥 Instalação / Nova Solicitação</option>
+        </select>
+
+        <label>Ocorrência / Chamado</label><input type="text" id="problema" placeholder="Ex: Configuração de Rede">
+        <label>Modelo Rápido</label><select id="templateSelect" onchange="carregarCamposDinamicos()"><option value="">-- Carregando... --</option></select>
         
         <div id="areaDinamica" class="checklist-container">
             <div class="checklist-title">Testes e Validações</div><div id="listaTestes"></div>
@@ -95,9 +86,8 @@
         </div>
         
         <label>Procedimento Técnico Final</label>
-        <textarea id="procedimento" rows="10" placeholder="Selecione um modelo rápido para gerar a estrutura..."></textarea>
+        <textarea id="procedimento" rows="8" placeholder="O script será montado aqui..."></textarea>
         
-        <div id="statusMsg"></div>
         <div class="btn-group">
             <button class="btn-clear" onclick="limparCampos()">Limpar</button>
             <button id="btnCopy" class="btn-copy" onclick="copiarTexto()">Copiar Script</button>
@@ -107,15 +97,13 @@
     <div id="settingsScreen">
         <h2>Gerenciar Nuvem ☁️</h2>
         <button class="btn-back" onclick="showMain()">← Voltar ao Início</button>
-        
         <div style="background: #252525; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
             <label>Título do Modelo</label><input type="text" id="newLabel">
-            <label>Tópicos de Teste (Separe por PONTO .)</label><textarea id="newTestes" rows="2" placeholder="Ex: Teste 1. Teste 2"></textarea>
-            <label>Opções de Resolução (Separe por PONTO .)</label><textarea id="newResolucoes" rows="2" placeholder="Ex: Solução 1. Solução 2"></textarea>
+            <label>Tópicos de Teste (PONTO . para separar)</label><textarea id="newTestes" rows="2"></textarea>
+            <label>Resoluções (PONTO . para separar)</label><textarea id="newResolucoes" rows="2"></textarea>
             <button id="btnSaveTemplate" class="btn-add" onclick="addTemplate()">Salvar na Nuvem</button>
         </div>
-        
-        <div style="margin-top: 20px;"><h3 style="font-size: 14px; color: var(--text-secondary);">Modelos Ativos na Nuvem:</h3><div id="templateList"></div></div>
+        <div style="margin-top: 20px;"><h3 style="font-size: 14px; color: var(--text-secondary);">Modelos Ativos:</h3><div id="templateList"></div></div>
     </div>
 </div>
 
@@ -158,56 +146,25 @@
     window.fazerLogin = function() {
         const email = document.getElementById('emailInput').value;
         const senha = document.getElementById('senhaInput').value;
-        const msg = document.getElementById('loginMsg');
-        msg.innerText = "Autenticando...";
-        msg.style.color = "var(--text-secondary)";
-        
-        signInWithEmailAndPassword(auth, email, senha)
-            .catch((error) => {
-                msg.style.color = "var(--accent-red)";
-                msg.innerText = "Erro: E-mail ou senha incorretos.";
-            });
-    }
-
-    window.fazerLogout = function() {
-        signOut(auth).then(() => {
-            document.getElementById('emailInput').value = '';
-            document.getElementById('senhaInput').value = '';
-            document.getElementById('loginMsg').innerText = '';
+        signInWithEmailAndPassword(auth, email, senha).catch(() => {
+            document.getElementById('loginMsg').innerText = "Erro: Acesso negado.";
         });
     }
 
+    window.fazerLogout = function() { signOut(auth); }
+
     async function carregarDaNuvem() {
         if(!currentUser) return;
-        document.getElementById('templateSelect').innerHTML = '<option value="">Carregando da nuvem...</option>';
-        try {
-            const docRef = doc(db, "userData", currentUser.uid);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists() && docSnap.data().templates) {
-                templates = docSnap.data().templates;
-            } else {
-                templates = {}; 
-            }
-            renderTemplates();
-        } catch(e) {
-            alert("Erro ao conectar no banco de dados.");
-        }
+        const docRef = doc(db, "userData", currentUser.uid);
+        const docSnap = await getDoc(docRef);
+        templates = docSnap.exists() ? docSnap.data().templates : {};
+        renderTemplates();
     }
 
     async function salvarNaNuvem() {
         if(!currentUser) return;
-        const btn = document.getElementById('btnSaveTemplate');
-        const textOriginal = btn ? btn.innerText : "";
-        if(btn) btn.innerText = "Salvando...";
-        
-        try {
-            const docRef = doc(db, "userData", currentUser.uid);
-            await setDoc(docRef, { templates: templates }, { merge: true });
-            if(btn) btn.innerText = textOriginal;
-        } catch(e) {
-            alert("Erro ao salvar na nuvem.");
-            if(btn) btn.innerText = textOriginal;
-        }
+        const docRef = doc(db, "userData", currentUser.uid);
+        await setDoc(docRef, { templates: templates }, { merge: true });
     }
 
     window.showSettings = function() { document.getElementById('mainScreen').style.display='none'; document.getElementById('settingsScreen').style.display='block'; }
@@ -240,7 +197,6 @@
         const tMarcados = Array.from(document.querySelectorAll('.check-test:checked')).map(c => c.value);
         const rMarcadas = Array.from(document.querySelectorAll('.check-res:checked')).map(c => c.value);
         let texto = "";
-        
         if(tMarcados.length > 0) { texto += "TESTES E VALIDAÇÕES:\n" + tMarcados.map(t => " • " + t).join("\n"); }
         if(rMarcadas.length > 0) {
             if(texto !== "") texto += "\n\n"; 
@@ -256,9 +212,7 @@
         if (label) {
             if (editingKey && editingKey !== label) delete templates[editingKey];
             templates[label] = { testes: testes, resolucoes: res };
-            renderTemplates(); 
-            await salvarNaNuvem(); 
-            window.cancelEdit();
+            renderTemplates(); await salvarNaNuvem(); window.cancelEdit();
         }
     }
 
@@ -268,37 +222,34 @@
         document.getElementById('newLabel').value = label;
         document.getElementById('newTestes').value = data.testes.join('. ');
         document.getElementById('newResolucoes').value = data.resolucoes.join('. ');
-        const btn = document.getElementById('btnSaveTemplate');
-        btn.innerText = "Atualizar na Nuvem"; btn.style.backgroundColor = "var(--accent-blue)";
-        window.scrollTo(0,0);
+        document.getElementById('btnSaveTemplate').innerText = "Atualizar na Nuvem";
     }
 
     window.cancelEdit = function() {
         editingKey = null;
         document.getElementById('newLabel').value = ''; document.getElementById('newTestes').value = ''; document.getElementById('newResolucoes').value = '';
-        const btn = document.getElementById('btnSaveTemplate');
-        if(btn) { btn.innerText = "Salvar na Nuvem"; btn.style.backgroundColor = "var(--accent-green)"; }
+        document.getElementById('btnSaveTemplate').innerText = "Salvar na Nuvem";
     }
 
-    window.deleteTemplate = async function(l) { 
-        if(confirm(`Deseja deletar permanentemente "${l}" da nuvem?`)) { 
-            delete templates[l]; 
-            renderTemplates(); 
-            await salvarNaNuvem(); 
-        } 
-    }
+    window.deleteTemplate = async function(l) { if(confirm(`Deletar permanentemente "${l}"?`)) { delete templates[l]; renderTemplates(); await salvarNaNuvem(); } }
 
     window.copiarTexto = function() {
         const trat = document.getElementById('tratamento').value;
         const user = document.getElementById('usuario').value || "...";
         const prob = document.getElementById('problema').value || "...";
         const proc = document.getElementById('procedimento').value || "...";
+        const tipo = document.getElementById('tipoAtendimento').value;
+
+        // Lógica da frase dinâmica baseada na escolha
+        const fraseSucesso = (tipo === "problema") 
+            ? `Destacamos que o problema foi solucionado com sucesso` 
+            : `Destacamos que a instalação foi concluída com sucesso`;
         
-        const script = `Prezado(a) ${user},\n\nComunicamos a conclusão do atendimento técnico referente à solicitação: "${prob}".\n\nA seguir, apresentamos o relatório das ações executadas:\n\n${proc}\n\nDestacamos que o problema foi solucionado com sucesso, e o pleno funcionamento dos recursos foi testado e aprovado pelo(a) ${trat} ${user} no ato do atendimento.\n\nDiante da resolução, este chamado encontra-se formalmente encerrado em nosso sistema. Em caso de reincidência ou para novas solicitações, orientamos a abertura de um novo chamado, garantindo assim o registro e a conformidade do suporte prestado.\n\nAtenciosamente,\nEquipe de Suporte Técnico.`;
+        const script = `Prezado(a) ${user},\n\nComunicamos a conclusão do atendimento técnico referente à solicitação: "${prob}".\n\nA seguir, apresentamos o relatório das ações executadas:\n\n${proc}\n\n${fraseSucesso}, e o pleno funcionamento dos recursos foi testado e aprovado pelo(a) ${trat} ${user} no ato do atendimento.\n\nDiante da resolução, este chamado encontra-se formalmente encerrado em nosso sistema. Em caso de reincidência ou para novas solicitações, orientamos a abertura de um novo chamado, garantindo assim o registro e a conformidade do suporte prestado.\n\nAtenciosamente,\nEquipe de Suporte Técnico.`;
         
         navigator.clipboard.writeText(script).then(() => {
-            const btn = document.getElementById('btnCopy'); btn.innerText = "Copiado!";
-            setTimeout(() => { btn.innerText = "Copiar Script"; }, 2000);
+            document.getElementById('btnCopy').innerText = "Copiado!";
+            setTimeout(() => { document.getElementById('btnCopy').innerText = "Copiar Script"; }, 2000);
         });
     }
 
@@ -309,7 +260,6 @@
     }
 
     document.addEventListener('contextmenu', e => e.preventDefault());
-
 </script>
 </body>
 </html>
