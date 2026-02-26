@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Suporte Técnico - Cloud Sync v9.3</title>
+    <title>Suporte Técnico - Cloud Sync v9.4</title>
     <style>
         :root {
             --bg-body: #121212; --bg-container: #1e1e1e; --bg-input: #2d2d2d;
@@ -35,10 +35,10 @@
         .btn-logout { background-color: transparent; color: var(--accent-red); border: 1px solid var(--accent-red); font-size: 11px; padding: 5px 8px; }
         .btn-add { background: var(--accent-green); color: white; width: 100%; margin-top: 10px; }
         
-        .template-item { display: flex; justify-content: space-between; align-items: center; background: #252525; padding: 10px; margin-bottom: 8px; border-radius: 6px; border: 1px solid var(--border-color); font-size: 13px; }
-        .actions { display: flex; gap: 15px; }
-        .btn-action-edit { color: var(--accent-blue); cursor: pointer; font-weight: bold; border: none; background: none; }
-        .btn-action-del { color: var(--accent-red); cursor: pointer; font-weight: bold; border: none; background: none; }
+        /* Estilo para a área de edição em Configurações */
+        .edit-controls { display: flex; gap: 10px; margin-top: 10px; display: none; }
+        .btn-edit-mode { background: var(--accent-blue); color: white; flex: 1; padding: 8px; font-size: 12px; }
+        .btn-del-mode { background: var(--accent-red); color: white; flex: 1; padding: 8px; font-size: 12px; }
 
         #loginScreen, #appScreen, #mainScreen, #settingsScreen { display: none; }
         
@@ -95,15 +95,28 @@
     </div>
 
     <div id="settingsScreen">
-        <h2>Gerenciar Nuvem ☁️</h2>
+        <h2>Configurações ☁️</h2>
         <button class="btn-back" onclick="showMain()">← Voltar ao Início</button>
-        <div style="background: #252525; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
-            <label>Título do Modelo</label><input type="text" id="newLabel">
-            <label>Tópicos de Teste (PONTO . para separar)</label><textarea id="newTestes" rows="2"></textarea>
-            <label>Resoluções (PONTO . para separar)</label><textarea id="newResolucoes" rows="2"></textarea>
-            <button id="btnSaveTemplate" class="btn-add" onclick="addTemplate()">Salvar na Nuvem</button>
+        
+        <div style="background: #2d2d2d; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color);">
+            <label style="margin-top: 0; color: var(--accent-blue);">Modelos Salvos na Nuvem</label>
+            <select id="manageSelect" onchange="toggleEditControls()">
+                <option value="">-- Escolha um modelo para Editar/Excluir --</option>
+            </select>
+            <div id="editControls" class="edit-controls">
+                <button class="btn-edit-mode" onclick="triggerEdit()">📝 Editar Dados</button>
+                <button class="btn-del-mode" onclick="triggerDelete()">🗑️ Excluir</button>
+            </div>
         </div>
-        <div style="margin-top: 20px;"><h3 style="font-size: 14px; color: var(--text-secondary);">Modelos Ativos:</h3><div id="templateList"></div></div>
+
+        <div style="background: #252525; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+            <label id="formTitle" style="margin-top: 0; color: var(--accent-green);">Cadastrar Novo Procedimento</label>
+            <label>Título do Modelo</label><input type="text" id="newLabel" placeholder="Ex: Formatação Windows">
+            <label>Tópicos de Teste (Use PONTO . para separar)</label><textarea id="newTestes" rows="2" placeholder="Teste de Bios. Teste de HD"></textarea>
+            <label>Resoluções (Use PONTO . para separar)</label><textarea id="newResolucoes" rows="2" placeholder="Troca de Cabo. Limpeza Física"></textarea>
+            <button id="btnSaveTemplate" class="btn-add" onclick="addTemplate()">Salvar na Nuvem</button>
+            <button id="btnCancelEdit" style="display:none; background: transparent; color: var(--text-secondary); width: 100%; margin-top: 10px; border: 1px solid #444;" onclick="cancelEdit()">Cancelar Edição</button>
+        </div>
     </div>
 </div>
 
@@ -158,7 +171,7 @@
         const docRef = doc(db, "userData", currentUser.uid);
         const docSnap = await getDoc(docRef);
         templates = docSnap.exists() ? docSnap.data().templates : {};
-        renderTemplates();
+        renderMenus();
     }
 
     async function salvarNaNuvem() {
@@ -170,16 +183,69 @@
     window.showSettings = function() { document.getElementById('mainScreen').style.display='none'; document.getElementById('settingsScreen').style.display='block'; }
     window.showMain = function() { document.getElementById('mainScreen').style.display='block'; document.getElementById('settingsScreen').style.display='none'; window.cancelEdit(); }
 
-    function renderTemplates() {
-        const select = document.getElementById('templateSelect');
-        const list = document.getElementById('templateList');
-        select.innerHTML = '<option value="">-- Selecionar Modelo --</option>';
-        list.innerHTML = '';
-        for (const label in templates) {
-            const opt = document.createElement('option'); opt.value = label; opt.innerText = label; select.appendChild(opt);
-            const item = document.createElement('div'); item.className = 'template-item';
-            item.innerHTML = `<span>${label}</span><div class="actions"><button class="btn-action-edit" onclick="editTemplate('${label}')">Editar</button><button class="btn-action-del" onclick="deleteTemplate('${label}')">Excluir</button></div>`;
-            list.appendChild(item);
+    function renderMenus() {
+        const selectApp = document.getElementById('templateSelect');
+        const selectManage = document.getElementById('manageSelect');
+        
+        const options = '<option value="">-- Selecionar Modelo --</option>' + 
+            Object.keys(templates).map(l => `<option value="${l}">${l}</option>`).join('');
+        
+        selectApp.innerHTML = options;
+        selectManage.innerHTML = '<option value="">-- Escolha um modelo para Editar/Excluir --</option>' + 
+            Object.keys(templates).map(l => `<option value="${l}">${l}</option>`).join('');
+        
+        toggleEditControls();
+    }
+
+    window.toggleEditControls = function() {
+        const val = document.getElementById('manageSelect').value;
+        document.getElementById('editControls').style.display = val ? 'flex' : 'none';
+    }
+
+    window.triggerEdit = function() {
+        const label = document.getElementById('manageSelect').value;
+        if(!label) return;
+        editingKey = label;
+        const data = templates[label];
+        document.getElementById('newLabel').value = label;
+        document.getElementById('newTestes').value = data.testes.join('. ');
+        document.getElementById('newResolucoes').value = data.resolucoes.join('. ');
+        
+        document.getElementById('formTitle').innerText = "Editando Procedimento";
+        document.getElementById('formTitle').style.color = "var(--accent-blue)";
+        document.getElementById('btnSaveTemplate').innerText = "Atualizar na Nuvem";
+        document.getElementById('btnCancelEdit').style.display = "block";
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    window.triggerDelete = async function() {
+        const label = document.getElementById('manageSelect').value;
+        if(label && confirm(`Deseja deletar permanentemente "${label}"?`)) {
+            delete templates[label];
+            renderMenus();
+            await salvarNaNuvem();
+        }
+    }
+
+    window.cancelEdit = function() {
+        editingKey = null;
+        document.getElementById('newLabel').value = ''; document.getElementById('newTestes').value = ''; document.getElementById('newResolucoes').value = '';
+        document.getElementById('formTitle').innerText = "Cadastrar Novo Procedimento";
+        document.getElementById('formTitle').style.color = "var(--accent-green)";
+        document.getElementById('btnSaveTemplate').innerText = "Salvar na Nuvem";
+        document.getElementById('btnCancelEdit').style.display = "none";
+        document.getElementById('manageSelect').value = "";
+        toggleEditControls();
+    }
+
+    window.addTemplate = async function() {
+        const label = document.getElementById('newLabel').value.trim();
+        const testes = document.getElementById('newTestes').value.split('.').map(s => s.trim()).filter(s => s);
+        const res = document.getElementById('newResolucoes').value.split('.').map(s => s.trim()).filter(s => s);
+        if (label) {
+            if (editingKey && editingKey !== label) delete templates[editingKey];
+            templates[label] = { testes: testes, resolucoes: res };
+            renderMenus(); await salvarNaNuvem(); window.cancelEdit();
         }
     }
 
@@ -205,34 +271,6 @@
         document.getElementById('procedimento').value = texto;
     }
 
-    window.addTemplate = async function() {
-        const label = document.getElementById('newLabel').value.trim();
-        const testes = document.getElementById('newTestes').value.split('.').map(s => s.trim()).filter(s => s);
-        const res = document.getElementById('newResolucoes').value.split('.').map(s => s.trim()).filter(s => s);
-        if (label) {
-            if (editingKey && editingKey !== label) delete templates[editingKey];
-            templates[label] = { testes: testes, resolucoes: res };
-            renderTemplates(); await salvarNaNuvem(); window.cancelEdit();
-        }
-    }
-
-    window.editTemplate = function(label) {
-        editingKey = label;
-        const data = templates[label];
-        document.getElementById('newLabel').value = label;
-        document.getElementById('newTestes').value = data.testes.join('. ');
-        document.getElementById('newResolucoes').value = data.resolucoes.join('. ');
-        document.getElementById('btnSaveTemplate').innerText = "Atualizar na Nuvem";
-    }
-
-    window.cancelEdit = function() {
-        editingKey = null;
-        document.getElementById('newLabel').value = ''; document.getElementById('newTestes').value = ''; document.getElementById('newResolucoes').value = '';
-        document.getElementById('btnSaveTemplate').innerText = "Salvar na Nuvem";
-    }
-
-    window.deleteTemplate = async function(l) { if(confirm(`Deletar permanentemente "${l}"?`)) { delete templates[l]; renderTemplates(); await salvarNaNuvem(); } }
-
     window.copiarTexto = function() {
         const trat = document.getElementById('tratamento').value;
         const user = document.getElementById('usuario').value || "...";
@@ -240,7 +278,6 @@
         const proc = document.getElementById('procedimento').value || "...";
         const tipo = document.getElementById('tipoAtendimento').value;
 
-        // Lógica da frase dinâmica baseada na escolha
         const fraseSucesso = (tipo === "problema") 
             ? `Destacamos que o problema foi solucionado com sucesso` 
             : `Destacamos que a instalação foi concluída com sucesso`;
