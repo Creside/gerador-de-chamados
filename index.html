@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Suporte Técnico - Cloud Sync v10.0</title>
+    <title>Suporte Técnico - Cloud Sync v11.0</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -32,9 +32,7 @@
             --shadow: 0 4px 24px rgba(0,0,0,0.5);
             --transition: 0.18s ease;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
-
         body {
             font-family: var(--font-sans);
             background: var(--bg-body);
@@ -45,631 +43,183 @@
             align-items: flex-start;
             padding: 24px 16px 48px;
         }
-
-        /* Background grid */
         body::before {
             content: '';
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background-image:
                 linear-gradient(rgba(79,158,255,0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(79,158,255,0.03) 1px, transparent 1px);
             background-size: 40px 40px;
-            pointer-events: none;
-            z-index: 0;
+            pointer-events: none; z-index: 0;
         }
-
         .container {
             background: var(--bg-container);
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 28px;
-            width: 100%;
-            max-width: 620px;
+            width: 100%; max-width: 620px;
             box-shadow: var(--shadow), 0 0 0 1px rgba(255,255,255,0.03);
-            position: relative;
-            z-index: 1;
+            position: relative; z-index: 1;
             animation: fadeUp 0.3s ease;
         }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
 
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        /* HEADER */
+        .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding-bottom:18px; border-bottom:1px solid var(--border); }
+        .page-title { font-family:var(--font-mono); font-size:15px; font-weight:700; color:var(--accent-blue); letter-spacing:-0.3px; display:flex; align-items:center; gap:8px; }
+        .page-title::before { content:''; width:8px; height:8px; background:var(--accent-green); border-radius:50%; box-shadow:0 0 8px var(--accent-green); flex-shrink:0; }
+        .header-actions { display:flex; gap:8px; align-items:center; }
 
-        /* ─── HEADER ─── */
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 18px;
-            border-bottom: 1px solid var(--border);
-        }
+        /* BUTTONS */
+        button { font-family:var(--font-sans); font-size:13px; font-weight:600; cursor:pointer; border:none; border-radius:var(--radius-sm); padding:9px 16px; transition:all var(--transition); letter-spacing:0.2px; }
+        .btn-icon { background:transparent; color:var(--text-secondary); border:1px solid var(--border); padding:7px 12px; font-size:12px; }
+        .btn-icon:hover { background:var(--bg-hover); color:var(--text-primary); border-color:#3a3a42; }
+        .btn-danger-icon { background:transparent; color:var(--accent-red); border:1px solid rgba(255,95,95,0.25); padding:7px 12px; font-size:12px; }
+        .btn-danger-icon:hover { background:var(--accent-red-dim); }
+        .btn-primary { background:var(--accent-blue); color:#fff; width:100%; padding:13px; font-size:14px; border-radius:var(--radius); margin-top:16px; }
+        .btn-primary:hover { background:#6aadff; transform:translateY(-1px); box-shadow:0 4px 16px rgba(79,158,255,0.3); }
+        .btn-primary:disabled { background:#2a2a32; color:var(--text-muted); cursor:not-allowed; transform:none; box-shadow:none; }
+        .btn-success { background:var(--accent-green); color:#0d1a10; width:100%; padding:11px; margin-top:10px; font-size:13px; }
+        .btn-success:hover { background:#5ade8a; transform:translateY(-1px); }
+        .btn-outline { background:transparent; color:var(--text-secondary); border:1px solid var(--border); width:100%; padding:11px; margin-top:8px; }
+        .btn-outline:hover { background:var(--bg-hover); color:var(--text-primary); }
+        .btn-ghost-red { background:transparent; color:var(--text-muted); border:1px solid var(--border); width:100%; padding:9px; margin-top:8px; font-size:12px; }
+        .btn-ghost-red:hover { color:var(--accent-red); border-color:rgba(255,95,95,0.3); }
+        .btn-back { background:var(--bg-card); color:var(--text-secondary); border:1px solid var(--border); padding:9px 16px; margin-bottom:20px; font-size:12px; }
+        .btn-back:hover { background:var(--bg-hover); color:var(--text-primary); }
+        .btn-group { display:grid; grid-template-columns:1fr 2fr; gap:10px; margin-top:20px; }
+        .btn-clear { background:var(--bg-card); color:var(--text-secondary); border:1px solid var(--border); }
+        .btn-clear:hover { background:var(--bg-hover); color:var(--text-primary); }
+        .btn-copy { background:var(--accent-blue); color:white; }
+        .btn-copy:hover { background:#6aadff; }
+        .btn-copy:disabled { background:#2a2a32; color:var(--text-muted); cursor:not-allowed; }
+        .btn-copy.copied { background:var(--accent-green); color:#0d1a10; }
 
-        .page-title {
-            font-family: var(--font-mono);
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--accent-blue);
-            letter-spacing: -0.3px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        /* FORM */
+        label { display:block; margin-top:16px; font-size:11px; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.8px; font-family:var(--font-mono); margin-bottom:6px; }
+        input, textarea, select { width:100%; padding:11px 14px; border:1px solid var(--border); border-radius:var(--radius-sm); background:var(--bg-input); color:var(--text-primary); font-family:var(--font-sans); font-size:14px; transition:all var(--transition); outline:none; -webkit-appearance:none; }
+        input:focus, textarea:focus, select:focus { border-color:var(--border-focus); background:#1a1a22; box-shadow:0 0 0 3px rgba(79,158,255,0.1); }
+        input::placeholder, textarea::placeholder { color:var(--text-muted); }
+        select option { background:#1f1f24; }
+        textarea { resize:vertical; line-height:1.6; }
+        textarea[readonly] { background:#111115; font-family:var(--font-mono); font-size:13px; color:var(--text-secondary); }
+        .inline-row { display:flex; gap:10px; }
+        .inline-row .tratamento-wrap { width:90px; flex-shrink:0; }
+        .inline-row .usuario-wrap { flex:1; }
 
-        .page-title::before {
-            content: '';
-            width: 8px; height: 8px;
-            background: var(--accent-green);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent-green);
-            flex-shrink: 0;
-        }
+        /* TECNICO */
+        .tecnico-section { display:flex; align-items:center; gap:8px; margin-top:6px; background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px 12px; cursor:pointer; transition:all var(--transition); }
+        .tecnico-section:hover { border-color:rgba(79,158,255,0.3); }
+        .tecnico-icon { font-size:14px; flex-shrink:0; }
+        .tecnico-name { font-size:13px; color:var(--text-secondary); flex:1; }
+        .tecnico-name.set { color:var(--text-primary); }
+        .tecnico-edit-hint { font-size:10px; color:var(--text-muted); font-family:var(--font-mono); }
 
-        .header-actions { display: flex; gap: 8px; align-items: center; }
+        /* SEARCH */
+        .search-wrap { position:relative; margin-top:6px; }
+        .search-wrap input { padding-left:34px; margin-top:0; }
+        .search-icon { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-muted); font-size:13px; pointer-events:none; }
+        .search-clear { position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--text-muted); font-size:14px; cursor:pointer; padding:2px 6px; display:none; border-radius:4px; }
+        .search-clear:hover { color:var(--text-secondary); background:var(--bg-hover); }
 
-        /* ─── BUTTONS ─── */
-        button {
-            font-family: var(--font-sans);
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            border-radius: var(--radius-sm);
-            padding: 9px 16px;
-            transition: all var(--transition);
-            letter-spacing: 0.2px;
-        }
+        /* CATEGORY CHIPS */
+        .cat-filter { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+        .cat-chip { font-size:11px; font-family:var(--font-mono); font-weight:600; padding:4px 10px; border-radius:20px; border:1px solid var(--border); background:var(--bg-input); color:var(--text-muted); cursor:pointer; transition:all var(--transition); white-space:nowrap; user-select:none; }
+        .cat-chip:hover { border-color:#3a3a42; color:var(--text-secondary); }
+        .cat-chip.active { background:var(--accent-blue-dim); border-color:rgba(79,158,255,0.4); color:var(--accent-blue); }
 
-        .btn-icon {
-            background: transparent;
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-            padding: 7px 12px;
-            font-size: 12px;
-        }
-        .btn-icon:hover { background: var(--bg-hover); color: var(--text-primary); border-color: #3a3a42; }
+        /* NO RESULTS */
+        .no-results { text-align:center; padding:14px; color:var(--text-muted); font-size:12px; font-style:italic; }
 
-        .btn-danger-icon {
-            background: transparent;
-            color: var(--accent-red);
-            border: 1px solid rgba(255,95,95,0.25);
-            padding: 7px 12px;
-            font-size: 12px;
-        }
-        .btn-danger-icon:hover { background: var(--accent-red-dim); }
+        /* CHECKLIST */
+        .checklist-container { background:#0f0f14; border:1px dashed rgba(79,158,255,0.25); border-radius:var(--radius); padding:16px; margin-top:10px; display:none; animation:fadeUp 0.2s ease; }
+        .checklist-section-title { font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--accent-blue); text-transform:uppercase; letter-spacing:1.2px; border-left:2px solid var(--accent-blue); padding-left:8px; margin-bottom:12px; }
+        .checklist-section + .checklist-section { margin-top:16px; }
+        .check-item { display:flex; align-items:flex-start; gap:10px; padding:7px 10px; border-radius:var(--radius-sm); cursor:pointer; transition:background var(--transition); margin-bottom:4px; }
+        .check-item:hover { background:rgba(79,158,255,0.06); }
+        .check-item input[type="checkbox"] { width:16px; height:16px; flex-shrink:0; margin-top:1px; accent-color:var(--accent-blue); cursor:pointer; padding:0; border:none; }
+        .check-item span { font-size:13px; color:var(--text-secondary); line-height:1.5; flex:1; }
+        .check-item:has(input:checked) span { color:var(--text-primary); }
 
-        .btn-primary {
-            background: var(--accent-blue);
-            color: #fff;
-            width: 100%;
-            padding: 13px;
-            font-size: 14px;
-            border-radius: var(--radius);
-            margin-top: 16px;
-        }
-        .btn-primary:hover { background: #6aadff; transform: translateY(-1px); box-shadow: 0 4px 16px rgba(79,158,255,0.3); }
-        .btn-primary:active { transform: translateY(0); }
-        .btn-primary:disabled { background: #2a2a32; color: var(--text-muted); cursor: not-allowed; transform: none; box-shadow: none; }
+        /* PREVIEW */
+        .preview-wrapper { position:relative; margin-top:6px; }
+        .preview-label-badge { position:absolute; top:10px; right:10px; font-family:var(--font-mono); font-size:9px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; background:var(--bg-body); padding:2px 6px; border-radius:4px; border:1px solid var(--border); }
 
-        .btn-success {
-            background: var(--accent-green);
-            color: #0d1a10;
-            width: 100%;
-            padding: 11px;
-            margin-top: 10px;
-            font-size: 13px;
-        }
-        .btn-success:hover { background: #5ade8a; transform: translateY(-1px); }
+        /* SCREENS */
+        .screen { display:none; }
+        .screen.active { display:block; animation:fadeUp 0.25s ease; }
 
-        .btn-outline {
-            background: transparent;
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-            width: 100%;
-            padding: 11px;
-            margin-top: 8px;
-        }
-        .btn-outline:hover { background: var(--bg-hover); color: var(--text-primary); }
+        /* LOGIN */
+        .login-logo { text-align:center; margin-bottom:28px; }
+        .login-logo .logo-icon { width:52px; height:52px; background:var(--accent-blue-dim); border:1px solid rgba(79,158,255,0.2); border-radius:14px; display:inline-flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:12px; }
+        .login-logo h2 { font-family:var(--font-mono); font-size:16px; font-weight:700; color:var(--text-primary); }
+        .login-logo p { font-size:13px; color:var(--text-muted); margin-top:4px; }
+        #loginMsg { text-align:center; font-size:13px; color:var(--accent-red); margin-top:12px; min-height:20px; }
 
-        .btn-ghost-red {
-            background: transparent;
-            color: var(--text-muted);
-            border: 1px solid var(--border);
-            width: 100%;
-            padding: 9px;
-            margin-top: 8px;
-            font-size: 12px;
-        }
-        .btn-ghost-red:hover { color: var(--accent-red); border-color: rgba(255,95,95,0.3); }
+        /* EMPTY */
+        .empty-state { text-align:center; padding:32px 20px; color:var(--text-muted); border:1px dashed var(--border); border-radius:var(--radius); margin-top:10px; }
+        .empty-state .empty-icon { font-size:28px; margin-bottom:10px; }
+        .empty-state p { font-size:13px; line-height:1.6; }
+        .empty-state strong { color:var(--text-secondary); }
 
-        .btn-back {
-            background: var(--bg-card);
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-            padding: 9px 16px;
-            margin-bottom: 20px;
-            font-size: 12px;
-        }
-        .btn-back:hover { background: var(--bg-hover); color: var(--text-primary); }
+        /* SETTINGS */
+        .settings-section { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:16px; }
+        .settings-section-label { font-family:var(--font-mono); font-size:10px; font-weight:700; color:var(--accent-blue); text-transform:uppercase; letter-spacing:1px; margin-bottom:14px; margin-top:0; }
+        .edit-controls { display:none; gap:8px; margin-top:10px; }
+        .edit-controls.visible { display:flex; }
+        .btn-edit { background:var(--accent-blue-dim); color:var(--accent-blue); border:1px solid rgba(79,158,255,0.25); flex:1; padding:9px; font-size:12px; }
+        .btn-edit:hover { background:rgba(79,158,255,0.2); }
+        .btn-del { background:var(--accent-red-dim); color:var(--accent-red); border:1px solid rgba(255,95,95,0.25); flex:1; padding:9px; font-size:12px; }
+        .btn-del:hover { background:rgba(255,95,95,0.2); }
+        .form-editing-badge { display:inline-block; font-size:10px; font-family:var(--font-mono); background:rgba(245,200,66,0.15); color:var(--accent-yellow); border:1px solid rgba(245,200,66,0.25); padding:2px 8px; border-radius:20px; margin-left:8px; vertical-align:middle; }
 
-        .btn-group { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; margin-top: 20px; }
-        .btn-group .btn-clear {
-            background: var(--bg-card);
-            color: var(--text-secondary);
-            border: 1px solid var(--border);
-        }
-        .btn-group .btn-clear:hover { background: var(--bg-hover); color: var(--text-primary); }
+        /* MODAL */
+        .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); z-index:100; display:none; align-items:center; justify-content:center; padding:20px; }
+        .modal-overlay.visible { display:flex; }
+        .modal { background:var(--bg-container); border:1px solid var(--border); border-radius:14px; padding:24px; max-width:380px; width:100%; box-shadow:0 20px 60px rgba(0,0,0,0.6); animation:fadeUp 0.2s ease; }
+        .modal-title { font-size:15px; font-weight:600; margin-bottom:8px; color:var(--text-primary); }
+        .modal-body { font-size:13px; color:var(--text-secondary); line-height:1.6; margin-bottom:20px; }
+        .modal-actions { display:flex; gap:10px; }
+        .modal-actions .btn-cancel-modal { background:var(--bg-card); color:var(--text-secondary); border:1px solid var(--border); flex:1; }
+        .modal-actions .btn-cancel-modal:hover { background:var(--bg-hover); }
+        .modal-actions .btn-confirm-modal { background:var(--accent-red); color:white; flex:2; }
+        .modal-actions .btn-confirm-modal:hover { background:#ff7878; }
 
-        .btn-copy {
-            background: var(--accent-blue);
-            color: white;
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-copy:hover { background: #6aadff; }
-        .btn-copy:disabled { background: #2a2a32; color: var(--text-muted); cursor: not-allowed; }
-        .btn-copy.copied { background: var(--accent-green); color: #0d1a10; }
+        /* TOAST */
+        .toast-container { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); z-index:200; display:flex; flex-direction:column; gap:8px; pointer-events:none; align-items:center; }
+        .toast { background:var(--bg-card); border:1px solid var(--border); border-radius:8px; padding:10px 16px; font-size:13px; font-weight:500; color:var(--text-primary); box-shadow:0 4px 20px rgba(0,0,0,0.5); animation:toastIn 0.2s ease, toastOut 0.3s ease 2.5s forwards; white-space:nowrap; display:flex; align-items:center; gap:8px; }
+        .toast.success { border-color:rgba(62,207,116,0.3); }
+        .toast.error { border-color:rgba(255,95,95,0.3); }
+        .toast.info { border-color:rgba(79,158,255,0.3); }
+        @keyframes toastIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes toastOut { from { opacity:1; } to { opacity:0; transform:translateY(8px); } }
 
-        /* ─── FORM ELEMENTS ─── */
-        label {
-            display: block;
-            margin-top: 16px;
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            font-family: var(--font-mono);
-            margin-bottom: 6px;
-        }
+        /* LOADER */
+        .btn-loader { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.3); border-top-color:white; border-radius:50%; animation:spin 0.7s linear infinite; vertical-align:middle; margin-right:6px; }
+        @keyframes spin { to { transform:rotate(360deg); } }
 
-        input, textarea, select {
-            width: 100%;
-            padding: 11px 14px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            background: var(--bg-input);
-            color: var(--text-primary);
-            font-family: var(--font-sans);
-            font-size: 14px;
-            transition: all var(--transition);
-            outline: none;
-            -webkit-appearance: none;
-        }
+        /* HISTORY */
+        .history-list { display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+        .history-item { background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 14px; cursor:pointer; transition:all var(--transition); }
+        .history-item:hover { border-color:rgba(79,158,255,0.3); background:var(--bg-hover); }
+        .history-item-title { font-size:13px; font-weight:600; color:var(--text-primary); margin-bottom:3px; }
+        .history-item-meta { font-size:11px; color:var(--text-muted); font-family:var(--font-mono); }
 
-        input:focus, textarea:focus, select:focus {
-            border-color: var(--border-focus);
-            background: #1a1a22;
-            box-shadow: 0 0 0 3px rgba(79,158,255,0.1);
-        }
-
-        input::placeholder, textarea::placeholder { color: var(--text-muted); }
-        select option { background: #1f1f24; }
-
-        textarea { resize: vertical; line-height: 1.6; }
-        textarea[readonly] { background: #111115; font-family: var(--font-mono); font-size: 13px; color: var(--text-secondary); }
-
-        .inline-row { display: flex; gap: 10px; }
-        .inline-row .tratamento-wrap { width: 90px; flex-shrink: 0; }
-        .inline-row .usuario-wrap { flex: 1; }
-
-        /* ─── CHECKLIST ─── */
-        .checklist-container {
-            background: #0f0f14;
-            border: 1px dashed rgba(79,158,255,0.25);
-            border-radius: var(--radius);
-            padding: 16px;
-            margin-top: 10px;
-            display: none;
-            animation: fadeUp 0.2s ease;
-        }
-
-        .checklist-section-title {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--accent-blue);
-            text-transform: uppercase;
-            letter-spacing: 1.2px;
-            border-left: 2px solid var(--accent-blue);
-            padding-left: 8px;
-            margin-bottom: 12px;
-        }
-
-        .checklist-section + .checklist-section { margin-top: 16px; }
-
-        .check-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            padding: 7px 10px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: background var(--transition);
-            margin-bottom: 4px;
-        }
-        .check-item:hover { background: rgba(79,158,255,0.06); }
-        .check-item input[type="checkbox"] {
-            width: 16px; height: 16px;
-            flex-shrink: 0;
-            margin-top: 1px;
-            accent-color: var(--accent-blue);
-            cursor: pointer;
-            padding: 0;
-            border: none;
-        }
-        .check-item span { font-size: 13px; color: var(--text-secondary); line-height: 1.5; flex: 1; }
-        .check-item:has(input:checked) span { color: var(--text-primary); }
-
-        /* ─── PREVIEW ─── */
-        .preview-wrapper { position: relative; margin-top: 6px; }
-        .preview-label-badge {
-            position: absolute;
-            top: 10px; right: 10px;
-            font-family: var(--font-mono);
-            font-size: 9px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            background: var(--bg-body);
-            padding: 2px 6px;
-            border-radius: 4px;
-            border: 1px solid var(--border);
-        }
-
-        /* ─── SCREENS ─── */
-        .screen { display: none; }
-        .screen.active { display: block; animation: fadeUp 0.25s ease; }
-
-        /* ─── LOGIN ─── */
-        .login-logo {
-            text-align: center;
-            margin-bottom: 28px;
-        }
-        .login-logo .logo-icon {
-            width: 52px; height: 52px;
-            background: var(--accent-blue-dim);
-            border: 1px solid rgba(79,158,255,0.2);
-            border-radius: 14px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            margin-bottom: 12px;
-        }
-        .login-logo h2 {
-            font-family: var(--font-mono);
-            font-size: 16px;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-        .login-logo p {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
-        #loginMsg {
-            text-align: center;
-            font-size: 13px;
-            color: var(--accent-red);
-            margin-top: 12px;
-            min-height: 20px;
-        }
-
-        /* ─── EMPTY STATE ─── */
-        .empty-state {
-            text-align: center;
-            padding: 32px 20px;
-            color: var(--text-muted);
-            border: 1px dashed var(--border);
-            border-radius: var(--radius);
-            margin-top: 10px;
-        }
-        .empty-state .empty-icon { font-size: 28px; margin-bottom: 10px; }
-        .empty-state p { font-size: 13px; line-height: 1.6; }
-        .empty-state strong { color: var(--text-secondary); }
-
-        /* ─── SETTINGS ─── */
-        .settings-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-        .settings-section-label {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            font-weight: 700;
-            color: var(--accent-blue);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 14px;
-            margin-top: 0;
-        }
-
-        .edit-controls { display: none; gap: 8px; margin-top: 10px; }
-        .edit-controls.visible { display: flex; }
-        .btn-edit { background: var(--accent-blue-dim); color: var(--accent-blue); border: 1px solid rgba(79,158,255,0.25); flex: 1; padding: 9px; font-size: 12px; }
-        .btn-edit:hover { background: rgba(79,158,255,0.2); }
-        .btn-del { background: var(--accent-red-dim); color: var(--accent-red); border: 1px solid rgba(255,95,95,0.25); flex: 1; padding: 9px; font-size: 12px; }
-        .btn-del:hover { background: rgba(255,95,95,0.2); }
-
-        .form-editing-badge {
-            display: inline-block;
-            font-size: 10px;
-            font-family: var(--font-mono);
-            background: rgba(245,200,66,0.15);
-            color: var(--accent-yellow);
-            border: 1px solid rgba(245,200,66,0.25);
-            padding: 2px 8px;
-            border-radius: 20px;
-            margin-left: 8px;
-            vertical-align: middle;
-        }
-
-        /* ─── MODAL ─── */
-        .modal-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.7);
-            backdrop-filter: blur(4px);
-            z-index: 100;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            animation: fadeIn 0.15s ease;
-        }
-        .modal-overlay.visible { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .modal {
-            background: var(--bg-container);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 24px;
-            max-width: 380px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-            animation: modalIn 0.2s ease;
-        }
-        @keyframes modalIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        .modal-title {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-primary);
-        }
-        .modal-body {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-        .modal-actions { display: flex; gap: 10px; }
-        .modal-actions .btn-cancel-modal { background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border); flex: 1; }
-        .modal-actions .btn-cancel-modal:hover { background: var(--bg-hover); }
-        .modal-actions .btn-confirm-modal { background: var(--accent-red); color: white; flex: 2; }
-        .modal-actions .btn-confirm-modal:hover { background: #ff7878; }
-
-        /* ─── TOAST ─── */
-        .toast-container {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 200;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            pointer-events: none;
-            align-items: center;
-        }
-        .toast {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px 16px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-primary);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            animation: toastIn 0.2s ease, toastOut 0.3s ease 2.5s forwards;
-            white-space: nowrap;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .toast.success { border-color: rgba(62,207,116,0.3); }
-        .toast.error { border-color: rgba(255,95,95,0.3); }
-        .toast.info { border-color: rgba(79,158,255,0.3); }
-        @keyframes toastIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes toastOut { from { opacity: 1; } to { opacity: 0; transform: translateY(8px); } }
-
-        /* ─── LOADER ─── */
-        .btn-loader {
-            display: inline-block;
-            width: 14px; height: 14px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.7s linear infinite;
-            vertical-align: middle;
-            margin-right: 6px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .full-loader {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            padding: 32px;
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-
-        /* ─── HISTORY ─── */
-        .history-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-        .history-item {
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 12px 14px;
-            cursor: pointer;
-            transition: all var(--transition);
-        }
-        .history-item:hover { border-color: rgba(79,158,255,0.3); background: var(--bg-hover); }
-        .history-item-title { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 3px; }
-        .history-item-meta { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
-
-        /* ─── SEPARATOR ─── */
-        .separator {
-            border: none;
-            border-top: 1px solid var(--border);
-            margin: 20px 0;
-        }
-
-        /* ─── CATEGORY FILTER ─── */
-        .category-filter {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 6px;
-        }
-        .cat-chip {
-            font-size: 11px;
-            font-family: var(--font-mono);
-            font-weight: 600;
-            padding: 4px 10px;
-            border-radius: 20px;
-            border: 1px solid var(--border);
-            background: var(--bg-input);
-            color: var(--text-muted);
-            cursor: pointer;
-            transition: all var(--transition);
-            white-space: nowrap;
-            user-select: none;
-        }
-        .cat-chip:hover { border-color: #3a3a42; color: var(--text-secondary); }
-        .cat-chip.active {
-            background: var(--accent-blue-dim);
-            border-color: rgba(79,158,255,0.4);
-            color: var(--accent-blue);
-        }
-
-        /* ─── SEARCH BOX ─── */
-        .search-wrap { position: relative; margin-top: 6px; }
-        .search-wrap input {
-            padding-left: 34px;
-        }
-        .search-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-muted);
-            font-size: 13px;
-            pointer-events: none;
-        }
-        .search-wrap .clear-search {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 14px;
-            cursor: pointer;
-            padding: 2px 4px;
-            display: none;
-        }
-        .search-wrap .clear-search:hover { color: var(--text-secondary); }
-
-        /* ─── FAVORITES ─── */
-        .template-row {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-            margin-top: 6px;
-        }
-        .template-row select { margin-top: 0; flex: 1; }
-        .btn-fav {
-            flex-shrink: 0;
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            color: var(--text-muted);
-            font-size: 16px;
-            padding: 10px 12px;
-            cursor: pointer;
-            transition: all var(--transition);
-            line-height: 1;
-        }
-        .btn-fav:hover { background: var(--bg-hover); color: var(--accent-yellow); }
-        .btn-fav.is-fav { color: var(--accent-yellow); background: rgba(245,200,66,0.1); border-color: rgba(245,200,66,0.25); }
-
-        /* ─── STATS BADGE ─── */
-        .stats-badge {
-            font-family: var(--font-mono);
-            font-size: 10px;
-            color: var(--text-muted);
-            background: var(--bg-input);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 3px 9px;
-            margin-left: 8px;
-            vertical-align: middle;
-        }
-
-        /* ─── TECHNICIAN ─── */
-        .tecnico-section {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 6px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            padding: 8px 12px;
-            cursor: pointer;
-            transition: all var(--transition);
-        }
-        .tecnico-section:hover { border-color: rgba(79,158,255,0.3); }
-        .tecnico-icon { font-size: 14px; flex-shrink: 0; }
-        .tecnico-name { font-size: 13px; color: var(--text-secondary); flex: 1; }
-        .tecnico-name.set { color: var(--text-primary); }
-        .tecnico-edit-hint { font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); }
-
-        /* ─── NO RESULTS ─── */
-        .no-results {
-            text-align: center;
-            padding: 14px;
-            color: var(--text-muted);
-            font-size: 12px;
-            font-style: italic;
-        }
+        .separator { border:none; border-top:1px solid var(--border); margin:20px 0; }
+        .full-loader { display:flex; align-items:center; justify-content:center; gap:10px; padding:32px; color:var(--text-muted); font-size:13px; }
 
         @media (max-width: 500px) {
-            body { padding: 12px 10px 40px; }
-            .container { padding: 18px; border-radius: 12px; }
-            .btn-group { grid-template-columns: 1fr 1fr; }
-            .page-title { font-size: 13px; }
+            body { padding:12px 10px 40px; }
+            .container { padding:18px; border-radius:12px; }
+            .btn-group { grid-template-columns:1fr 1fr; }
+            .page-title { font-size:13px; }
         }
     </style>
 </head>
 <body>
 
-<!-- TOAST CONTAINER -->
 <div class="toast-container" id="toastContainer"></div>
 
-<!-- CONFIRM MODAL -->
 <div class="modal-overlay" id="confirmModal">
     <div class="modal">
         <div class="modal-title" id="modalTitle">Confirmar ação</div>
@@ -685,26 +235,22 @@
     <div class="login-logo">
         <div class="logo-icon">🔒</div>
         <h2>Acesso Restrito</h2>
-        <p>Cloud Sync v10.0 — Suporte Técnico</p>
+        <p>Cloud Sync v11.0 — Suporte Técnico</p>
     </div>
-    <div>
-        <label>E-mail</label>
-        <input type="email" id="emailInput" placeholder="seu@email.com" autocomplete="email">
-    </div>
-    <div>
-        <label>Senha</label>
-        <input type="password" id="senhaInput" placeholder="Sua senha" autocomplete="current-password">
-    </div>
+    <label>E-mail</label>
+    <input type="email" id="emailInput" placeholder="seu@email.com" autocomplete="email">
+    <label>Senha</label>
+    <input type="password" id="senhaInput" placeholder="Sua senha" autocomplete="current-password">
     <button class="btn-primary" id="btnLogin" onclick="fazerLogin()">Entrar no Sistema</button>
     <div id="loginMsg"></div>
 </div>
 
 <div class="container screen" id="appScreen">
 
-    <!-- MAIN SCREEN -->
+    <!-- MAIN -->
     <div class="screen" id="mainScreen">
         <div class="page-header">
-            <div class="page-title">Scripts Gerador <span class="stats-badge" id="statsBadge">0 scripts</span></div>
+            <div class="page-title">Scripts Gerador</div>
             <div class="header-actions">
                 <button class="btn-icon" onclick="showHistory()">📋 Histórico</button>
                 <button class="btn-icon" onclick="showSettings()">⚙ Config</button>
@@ -712,7 +258,6 @@
             </div>
         </div>
 
-        <!-- Técnico responsável -->
         <div class="tecnico-section" onclick="editarTecnico()">
             <span class="tecnico-icon">👤</span>
             <span class="tecnico-name" id="tecnicoDisplay">Definir técnico responsável...</span>
@@ -722,10 +267,7 @@
         <div class="inline-row" style="margin-top:16px;">
             <div class="tratamento-wrap">
                 <label>Trat.</label>
-                <select id="tratamento">
-                    <option>Sr.</option>
-                    <option>Sra.</option>
-                </select>
+                <select id="tratamento"><option>Sr.</option><option>Sra.</option></select>
             </div>
             <div class="usuario-wrap">
                 <label>Usuário / Solicitante</label>
@@ -743,25 +285,18 @@
         <input type="text" id="problema" placeholder="Ex: Lentidão no sistema, impressora offline..." oninput="debounceMontarScript()">
 
         <label>Observações Adicionais</label>
-        <textarea id="observacoes" rows="2" placeholder="Informações extras que devem constar no script final..." oninput="debounceMontarScript()"></textarea>
+        <textarea id="observacoes" rows="2" placeholder="Informações extras..." oninput="debounceMontarScript()"></textarea>
 
-        <!-- Modelo: categoria + busca + select + favorito -->
         <label style="margin-top:16px;">Modelo Rápido</label>
-
-        <div class="category-filter" id="categoryFilter"></div>
-
-        <div class="search-wrap" style="margin-top:8px;">
+        <div class="cat-filter" id="categoryFilter"></div>
+        <div class="search-wrap">
             <span class="search-icon">🔍</span>
-            <input type="text" id="templateSearch" placeholder="Buscar modelo..." oninput="filtrarModelos()">
-            <button class="clear-search" id="btnClearSearch" onclick="limparBusca()">✕</button>
+            <input type="text" id="templateSearch" placeholder="Buscar modelo..." oninput="onSearch()">
+            <button class="search-clear" id="btnClearSearch" onclick="clearSearch()">✕</button>
         </div>
-
-        <div class="template-row">
-            <select id="templateSelect" onchange="carregarCamposDinamicos()">
-                <option value="">-- Selecionar Modelo --</option>
-            </select>
-            <button class="btn-fav" id="btnFav" onclick="toggleFavorito()" title="Favoritar modelo">☆</button>
-        </div>
+        <select id="templateSelect" style="margin-top:8px;" onchange="carregarCamposDinamicos()">
+            <option value="">-- Selecionar Modelo --</option>
+        </select>
         <div id="templateEmptyHint"></div>
 
         <div id="areaDinamica" class="checklist-container">
@@ -787,23 +322,16 @@
         </div>
     </div>
 
-    <!-- HISTORY SCREEN -->
+    <!-- HISTORY -->
     <div class="screen" id="historyScreen">
-        <div class="page-header">
-            <div class="page-title">Histórico Local</div>
-        </div>
+        <div class="page-header"><div class="page-title">Histórico Local</div></div>
         <button class="btn-back" onclick="showMain()">← Voltar</button>
-
-        <div id="historyContent">
-            <div class="full-loader"><span>Carregando...</span></div>
-        </div>
+        <div id="historyContent"><div class="full-loader"><span>Carregando...</span></div></div>
     </div>
 
-    <!-- SETTINGS SCREEN -->
+    <!-- SETTINGS -->
     <div class="screen" id="settingsScreen">
-        <div class="page-header">
-            <div class="page-title">Configurações</div>
-        </div>
+        <div class="page-header"><div class="page-title">Configurações</div></div>
         <button class="btn-back" onclick="showMain()">← Voltar</button>
 
         <div class="settings-section">
@@ -819,7 +347,7 @@
 
         <div class="settings-section">
             <label class="settings-section-label" id="formTitle">Cadastrar Novo Procedimento</label>
-            <input type="text" id="newLabel" placeholder="Título do Modelo">
+            <input type="text" id="newLabel" placeholder="Título do Modelo (ex: 💻 TI — Meu Problema)">
             <label>Testes <span style="color:var(--text-muted);font-size:10px;text-transform:none;letter-spacing:0;font-family:var(--font-sans);">(uma por linha)</span></label>
             <textarea id="newTestes" rows="3" placeholder="Verificação de conectividade&#10;Reinicialização do serviço&#10;Teste de acesso remoto"></textarea>
             <label>Resoluções <span style="color:var(--text-muted);font-size:10px;text-transform:none;letter-spacing:0;font-family:var(--font-sans);">(uma por linha)</span></label>
@@ -837,7 +365,6 @@
             <button class="btn-outline" onclick="confirmarRestaurarPadroes()">🔄 Restaurar modelos padrão</button>
             <button class="btn-ghost-red" onclick="confirmarLimparHistorico()">🗑 Limpar histórico local</button>
         </div>
-
     </div>
 
 </div>
@@ -847,10 +374,6 @@
     import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // ─── FIREBASE CONFIG ───────────────────────────────────────────────────────
-    // ⚠️  SEGURANÇA: As regras do Firestore devem garantir que apenas usuários
-    //     autenticados possam ler/escrever os próprios dados (userData/{uid}).
-    //     Restrinja também esta chave por domínio no Google Cloud Console.
     const firebaseConfig = {
         apiKey: "AIzaSyByHEnrOw-b188DfXS-qE2guwVMujdkJ_0",
         authDomain: "gerador-de-chamados.firebaseapp.com",
@@ -868,66 +391,11 @@
     let editingKey = null;
     let currentUser = null;
     let debounceTimer = null;
-    let favorites = [];
     let activeCat = 'Todos';
     let tecnicoNome = '';
     const MAX_HISTORY = 30;
 
-    // ─── AUTH ──────────────────────────────────────────────────────────────────
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            currentUser = user;
-            // Load local prefs
-            favorites = JSON.parse(localStorage.getItem('suporte_favs') || '[]');
-            tecnicoNome = localStorage.getItem('suporte_tecnico') || '';
-            atualizarDisplayTecnico();
-            atualizarStatsBadge();
-            showScreen('loginScreen', false);
-            showScreen('appScreen', true);
-            showMain();
-            await carregarDaNuvem();
-        } else {
-            currentUser = null;
-            showScreen('loginScreen', true);
-            showScreen('appScreen', false);
-        }
-    });
-
-    window.fazerLogin = async function () {
-        const email = document.getElementById('emailInput').value.trim();
-        const senha = document.getElementById('senhaInput').value;
-        const btn = document.getElementById('btnLogin');
-        if (!email || !senha) {
-            document.getElementById('loginMsg').innerText = "Preencha e-mail e senha.";
-            return;
-        }
-        btn.innerHTML = '<span class="btn-loader"></span>Entrando...';
-        btn.disabled = true;
-        document.getElementById('loginMsg').innerText = '';
-        try {
-            await signInWithEmailAndPassword(auth, email, senha);
-        } catch (e) {
-            document.getElementById('loginMsg').innerText = "Credenciais inválidas. Tente novamente.";
-            btn.innerHTML = 'Entrar no Sistema';
-            btn.disabled = false;
-        }
-    };
-
-    window.fazerLogout = function () { signOut(auth); };
-
-    window.confirmarLogout = function () {
-        openModal('Encerrar sessão', 'Deseja sair do sistema?', () => signOut(auth));
-    };
-
-    // Entrar com Enter na tela de login
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && document.getElementById('loginScreen').classList.contains('active')) {
-            window.fazerLogin();
-        }
-    });
-
-    // ─── CLOUD ────────────────────────────────────────────────────────────────
-    // ─── DEFAULT TEMPLATES ──────────────────────────────────────────────────────
+    // ─── DEFAULT TEMPLATES ────────────────────────────────────────────────────
     const DEFAULT_TEMPLATES = {
         "💻 TI — Backup e restauração de dados": {
             testes: [
@@ -1460,6 +928,47 @@
         }
     };
 
+    // ─── AUTH ─────────────────────────────────────────────────────────────────
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUser = user;
+            tecnicoNome = localStorage.getItem('suporte_tecnico') || '';
+            atualizarDisplayTecnico();
+            showScreen('loginScreen', false);
+            showScreen('appScreen', true);
+            showMain();
+            await carregarDaNuvem();
+        } else {
+            currentUser = null;
+            showScreen('loginScreen', true);
+            showScreen('appScreen', false);
+        }
+    });
+
+    window.fazerLogin = async function () {
+        const email = document.getElementById('emailInput').value.trim();
+        const senha = document.getElementById('senhaInput').value;
+        const btn = document.getElementById('btnLogin');
+        if (!email || !senha) { document.getElementById('loginMsg').innerText = "Preencha e-mail e senha."; return; }
+        btn.innerHTML = '<span class="btn-loader"></span>Entrando...';
+        btn.disabled = true;
+        document.getElementById('loginMsg').innerText = '';
+        try {
+            await signInWithEmailAndPassword(auth, email, senha);
+        } catch (e) {
+            document.getElementById('loginMsg').innerText = "Credenciais inválidas. Tente novamente.";
+            btn.innerHTML = 'Entrar no Sistema'; btn.disabled = false;
+        }
+    };
+
+    window.fazerLogout = function () { signOut(auth); };
+    window.confirmarLogout = function () { openModal('Encerrar sessão', 'Deseja sair do sistema?', () => signOut(auth)); };
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && document.getElementById('loginScreen').classList.contains('active')) window.fazerLogin();
+    });
+
+    // ─── CLOUD ────────────────────────────────────────────────────────────────
     async function carregarDaNuvem() {
         if (!currentUser) return;
         try {
@@ -1468,10 +977,9 @@
             if (docSnap.exists() && docSnap.data().templates && Object.keys(docSnap.data().templates).length > 0) {
                 templates = docSnap.data().templates;
             } else {
-                // Primeiro acesso: semear com templates padrão
                 templates = { ...DEFAULT_TEMPLATES };
                 await setDoc(docRef, { templates }, { merge: true });
-                showToast('🎉 30 modelos padrão carregados automaticamente!', 'success');
+                showToast('🎉 Modelos padrão carregados!', 'success');
             }
             renderMenus();
         } catch (err) {
@@ -1491,183 +999,38 @@
         }
     }
 
-    // ─── SCREEN NAVIGATION ────────────────────────────────────────────────────
+    // ─── NAVIGATION ───────────────────────────────────────────────────────────
     function showScreen(id, visible) {
         const el = document.getElementById(id);
-        if (visible) {
-            el.style.display = 'block';
-            requestAnimationFrame(() => el.classList.add('active'));
-        } else {
-            el.classList.remove('active');
-            setTimeout(() => { el.style.display = 'none'; }, 50);
-        }
+        if (visible) { el.style.display = 'block'; requestAnimationFrame(() => el.classList.add('active')); }
+        else { el.classList.remove('active'); setTimeout(() => { el.style.display = 'none'; }, 50); }
     }
 
     function switchAppScreen(id) {
         ['mainScreen', 'settingsScreen', 'historyScreen'].forEach(s => {
             const el = document.getElementById(s);
-            if (s === id) {
-                el.style.display = 'block';
-                requestAnimationFrame(() => el.classList.add('active'));
-            } else {
-                el.classList.remove('active');
-                setTimeout(() => { el.style.display = 'none'; }, 50);
-            }
+            if (s === id) { el.style.display = 'block'; requestAnimationFrame(() => el.classList.add('active')); }
+            else { el.classList.remove('active'); setTimeout(() => { el.style.display = 'none'; }, 50); }
         });
     }
 
     window.showMain = function () { switchAppScreen('mainScreen'); };
     window.showSettings = function () { switchAppScreen('settingsScreen'); };
-    window.showHistory = function () {
-        switchAppScreen('historyScreen');
-        renderHistory();
-    };
-
-    // ─── TEMPLATES ────────────────────────────────────────────────────────────
-    function getCategories() {
-        const cats = new Set();
-        Object.keys(templates).forEach(name => {
-            const m = name.match(/^(.+?) —/);
-            if (m) cats.add(m[1].trim());
-            else cats.add('Outros');
-        });
-        return ['Todos', '⭐ Favoritos', ...Array.from(cats)];
-    }
-
-    function renderCategoryFilter() {
-        const cats = getCategories();
-        const el = document.getElementById('categoryFilter');
-        el.innerHTML = cats.map(cat =>
-            `<span class="cat-chip${cat === activeCat ? ' active' : ''}" onclick="setCat(${JSON.stringify(cat)})">${cat}</span>`
-        ).join('');
-    }
-
-    window.setCat = function(cat) {
-        activeCat = cat;
-        renderCategoryFilter();
-        document.getElementById('templateSearch').value = '';
-        document.getElementById('btnClearSearch').style.display = 'none';
-        populateTemplateSelect();
-    };
-
-    function getFilteredKeys() {
-        const search = (document.getElementById('templateSearch')?.value || '').toLowerCase().trim();
-        return Object.keys(templates).filter(name => {
-            const catMatch = activeCat === 'Todos'
-                ? true
-                : activeCat === '⭐ Favoritos'
-                    ? favorites.includes(name)
-                    : name.startsWith(activeCat);
-            const searchMatch = !search || name.toLowerCase().includes(search);
-            return catMatch && searchMatch;
-        }).sort((a, b) => {
-            // Favorites first within any filter
-            const aFav = favorites.includes(a) ? 0 : 1;
-            const bFav = favorites.includes(b) ? 0 : 1;
-            return aFav - bFav || a.localeCompare(b);
-        });
-    }
-
-    function populateTemplateSelect() {
-        const keys = getFilteredKeys();
-        const sel = document.getElementById('templateSelect');
-        const hint = document.getElementById('templateEmptyHint');
-        if (keys.length === 0) {
-            sel.innerHTML = '<option value="">-- Nenhum resultado --</option>';
-            hint.innerHTML = `<div class="no-results">Nenhum modelo encontrado para este filtro.</div>`;
-        } else {
-            sel.innerHTML = '<option value="">-- Selecionar Modelo --</option>' +
-                keys.map(l => {
-                    const star = favorites.includes(l) ? '⭐ ' : '';
-                    return `<option value="${escapeHtml(l)}">${star}${escapeHtml(l)}</option>`;
-                }).join('');
-            hint.innerHTML = '';
-        }
-        updateFavBtn();
-    }
-
-    function renderMenus() {
-        const keys = Object.keys(templates);
-        const hint = document.getElementById('templateEmptyHint');
-
-        if (keys.length === 0) {
-            document.getElementById('templateSelect').innerHTML = '<option value="">-- Nenhum modelo cadastrado --</option>';
-            hint.innerHTML = `<div class="empty-state"><div class="empty-icon">📂</div><p>Você ainda não tem modelos.<br><strong>Vá em Configurações → Cadastrar Novo Procedimento</strong> para criar o primeiro.</p></div>`;
-            document.getElementById('categoryFilter').innerHTML = '';
-        } else {
-            hint.innerHTML = '';
-            renderCategoryFilter();
-            populateTemplateSelect();
-        }
-
-        // Manage select (settings)
-        const selectManage = document.getElementById('manageSelect');
-        selectManage.innerHTML = '<option value="">-- Escolha para Editar/Excluir --</option>' +
-            keys.map(l => `<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('');
-        toggleEditControls();
-    }
-
-    window.filtrarModelos = function() {
-        const val = document.getElementById('templateSearch').value;
-        document.getElementById('btnClearSearch').style.display = val ? 'block' : 'none';
-        populateTemplateSelect();
-    };
-
-    window.limparBusca = function() {
-        document.getElementById('templateSearch').value = '';
-        document.getElementById('btnClearSearch').style.display = 'none';
-        populateTemplateSelect();
-    };
-
-    // ─── FAVORITES ────────────────────────────────────────────────────────────
-    function updateFavBtn() {
-        const sel = document.getElementById('templateSelect').value;
-        const btn = document.getElementById('btnFav');
-        if (!sel) { btn.textContent = '☆'; btn.classList.remove('is-fav'); return; }
-        const isFav = favorites.includes(sel);
-        btn.textContent = isFav ? '★' : '☆';
-        btn.classList.toggle('is-fav', isFav);
-    }
-
-    window.toggleFavorito = function() {
-        const sel = document.getElementById('templateSelect').value;
-        if (!sel) { showToast('⚠️ Selecione um modelo primeiro.', 'info'); return; }
-        const idx = favorites.indexOf(sel);
-        if (idx === -1) {
-            favorites.unshift(sel);
-            showToast('⭐ Adicionado aos favoritos!', 'success');
-        } else {
-            favorites.splice(idx, 1);
-            showToast('Removido dos favoritos.', 'info');
-        }
-        localStorage.setItem('suporte_favs', JSON.stringify(favorites));
-        renderCategoryFilter();
-        populateTemplateSelect();
-        // Re-select the same model
-        document.getElementById('templateSelect').value = sel;
-        updateFavBtn();
-    };
+    window.showHistory = function () { switchAppScreen('historyScreen'); renderHistory(); };
 
     // ─── TECHNICIAN ───────────────────────────────────────────────────────────
     function atualizarDisplayTecnico() {
         const el = document.getElementById('tecnicoDisplay');
         if (!el) return;
-        if (tecnicoNome) {
-            el.textContent = tecnicoNome;
-            el.classList.add('set');
-        } else {
-            el.textContent = 'Definir técnico responsável...';
-            el.classList.remove('set');
-        }
+        if (tecnicoNome) { el.textContent = tecnicoNome; el.classList.add('set'); }
+        else { el.textContent = 'Definir técnico responsável...'; el.classList.remove('set'); }
     }
 
-    window.editarTecnico = function() {
-        openModal(
-            'Técnico responsável',
+    window.editarTecnico = function () {
+        openModal('Técnico responsável',
             `<input type="text" id="tecnicoInput" value="${escapeHtml(tecnicoNome)}" placeholder="Seu nome completo" style="width:100%;padding:10px 12px;margin-top:8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-input);color:var(--text-primary);font-size:14px;font-family:var(--font-sans);">`,
             () => {
-                const val = document.getElementById('tecnicoInput')?.value.trim() || '';
-                tecnicoNome = val;
+                tecnicoNome = document.getElementById('tecnicoInput')?.value.trim() || '';
                 localStorage.setItem('suporte_tecnico', tecnicoNome);
                 atualizarDisplayTecnico();
                 debounceMontarScript();
@@ -1677,20 +1040,96 @@
         setTimeout(() => document.getElementById('tecnicoInput')?.focus(), 100);
     };
 
-    // ─── STATS ────────────────────────────────────────────────────────────────
-    function atualizarStatsBadge() {
-        const count = parseInt(localStorage.getItem('suporte_count') || '0');
-        const el = document.getElementById('statsBadge');
-        if (el) el.textContent = `${count} script${count !== 1 ? 's' : ''}`;
+    // ─── CATEGORY FILTER ──────────────────────────────────────────────────────
+    function getCats() {
+        const cats = new Set();
+        Object.keys(templates).forEach(name => {
+            const m = name.match(/^.+? — /);
+            // extract prefix before " — "
+            if (m) {
+                // e.g. "💻 TI" from "💻 TI — Computador lento"
+                const prefix = name.split(' — ')[0].trim();
+                cats.add(prefix);
+            } else {
+                cats.add('Outros');
+            }
+        });
+        return ['Todos', ...Array.from(cats).sort()];
     }
 
-    window.toggleEditControls = function () {
-        const controls = document.getElementById('editControls');
-        if (document.getElementById('manageSelect').value) {
-            controls.classList.add('visible');
+    function renderCats() {
+        const cats = getCats();
+        document.getElementById('categoryFilter').innerHTML = cats.map(c =>
+            `<span class="cat-chip${c === activeCat ? ' active' : ''}" onclick="setCat(${JSON.stringify(c)})">${c}</span>`
+        ).join('');
+    }
+
+    window.setCat = function (cat) {
+        activeCat = cat;
+        document.getElementById('templateSearch').value = '';
+        document.getElementById('btnClearSearch').style.display = 'none';
+        renderCats();
+        populateSelect();
+    };
+
+    function getFiltered() {
+        const q = (document.getElementById('templateSearch')?.value || '').toLowerCase().trim();
+        return Object.keys(templates).filter(name => {
+            const prefix = name.split(' — ')[0].trim();
+            const catOk = activeCat === 'Todos' || prefix === activeCat || (activeCat === 'Outros' && !name.includes(' — '));
+            const searchOk = !q || name.toLowerCase().includes(q);
+            return catOk && searchOk;
+        });
+    }
+
+    function populateSelect() {
+        const keys = getFiltered();
+        const sel = document.getElementById('templateSelect');
+        const hint = document.getElementById('templateEmptyHint');
+        if (keys.length === 0) {
+            sel.innerHTML = '<option value="">-- Nenhum resultado --</option>';
+            hint.innerHTML = '<div class="no-results">Nenhum modelo encontrado para este filtro.</div>';
         } else {
-            controls.classList.remove('visible');
+            sel.innerHTML = '<option value="">-- Selecionar Modelo --</option>' +
+                keys.map(l => `<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('');
+            hint.innerHTML = '';
         }
+    }
+
+    // ─── TEMPLATES MENU ───────────────────────────────────────────────────────
+    function renderMenus() {
+        const keys = Object.keys(templates);
+        if (keys.length === 0) {
+            document.getElementById('templateSelect').innerHTML = '<option value="">-- Nenhum modelo cadastrado --</option>';
+            document.getElementById('templateEmptyHint').innerHTML = `<div class="empty-state"><div class="empty-icon">📂</div><p>Nenhum modelo cadastrado.<br><strong>Vá em Configurações para criar.</strong></p></div>`;
+            document.getElementById('categoryFilter').innerHTML = '';
+        } else {
+            renderCats();
+            populateSelect();
+        }
+        document.getElementById('manageSelect').innerHTML =
+            '<option value="">-- Escolha para Editar/Excluir --</option>' +
+            keys.map(l => `<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('');
+        toggleEditControls();
+    }
+
+    window.onSearch = function () {
+        const val = document.getElementById('templateSearch').value;
+        document.getElementById('btnClearSearch').style.display = val ? 'block' : 'none';
+        // Reset category to Todos when searching
+        if (val) { activeCat = 'Todos'; renderCats(); }
+        populateSelect();
+    };
+
+    window.clearSearch = function () {
+        document.getElementById('templateSearch').value = '';
+        document.getElementById('btnClearSearch').style.display = 'none';
+        populateSelect();
+    };
+
+    window.toggleEditControls = function () {
+        const c = document.getElementById('editControls');
+        document.getElementById('manageSelect').value ? c.classList.add('visible') : c.classList.remove('visible');
     };
 
     window.triggerEdit = function () {
@@ -1711,16 +1150,12 @@
     window.triggerDelete = function () {
         const label = document.getElementById('manageSelect').value;
         if (!label) return;
-        openModal(
-            'Excluir modelo',
-            `Deseja excluir permanentemente o modelo "<strong>${label}</strong>"? Esta ação não pode ser desfeita.`,
-            async () => {
-                delete templates[label];
-                renderMenus();
-                await salvarNaNuvem();
-                showToast('🗑 Modelo excluído.', 'info');
-            }
-        );
+        openModal('Excluir modelo', `Deseja excluir permanentemente "<strong>${escapeHtml(label)}</strong>"?`, async () => {
+            delete templates[label];
+            renderMenus();
+            await salvarNaNuvem();
+            showToast('🗑 Modelo excluído.', 'info');
+        });
     };
 
     window.cancelEdit = function () {
@@ -1735,45 +1170,32 @@
 
     window.addTemplate = async function () {
         const label = document.getElementById('newLabel').value.trim();
-        // Separação por quebra de linha (mais intuitivo que ponto)
-        const testes = document.getElementById('newTestes').value
-            .split('\n').map(s => s.trim()).filter(Boolean);
-        const res = document.getElementById('newResolucoes').value
-            .split('\n').map(s => s.trim()).filter(Boolean);
-
-        if (!label) {
-            showToast('⚠️ Informe um título para o modelo.', 'error');
-            document.getElementById('newLabel').focus();
-            return;
-        }
-
+        const testes = document.getElementById('newTestes').value.split('\n').map(s => s.trim()).filter(Boolean);
+        const res = document.getElementById('newResolucoes').value.split('\n').map(s => s.trim()).filter(Boolean);
+        if (!label) { showToast('⚠️ Informe um título.', 'error'); document.getElementById('newLabel').focus(); return; }
         const btn = document.getElementById('btnSaveTemplate');
         btn.innerHTML = '<span class="btn-loader" style="border-top-color:#0d1a10;"></span>Salvando...';
         btn.disabled = true;
-
         if (editingKey && editingKey !== label) delete templates[editingKey];
         templates[label] = { testes, resolucoes: res };
         renderMenus();
         await salvarNaNuvem();
         window.cancelEdit();
-
-        btn.innerHTML = '☁ Salvar na Nuvem';
-        btn.disabled = false;
-        showToast('✅ Modelo salvo na nuvem!', 'success');
+        btn.innerHTML = '☁ Salvar na Nuvem'; btn.disabled = false;
+        showToast('✅ Modelo salvo!', 'success');
     };
 
     // ─── CHECKLIST & SCRIPT ───────────────────────────────────────────────────
     window.carregarCamposDinamicos = function () {
         const sel = document.getElementById('templateSelect').value;
         const area = document.getElementById('areaDinamica');
-        updateFavBtn();
         if (!sel) { area.style.display = 'none'; updateCopyBtn(); return; }
         area.style.display = 'block';
         const t = templates[sel];
-        document.getElementById('listaTestes').innerHTML = t.testes.map(item =>
+        document.getElementById('listaTestes').innerHTML = (t.testes || []).map(item =>
             `<label class="check-item"><input type="checkbox" class="check-test" value="${escapeHtml(item)}" onchange="montarProcedimento()"><span>${escapeHtml(item)}</span></label>`
         ).join('');
-        document.getElementById('listaResolucao').innerHTML = t.resolucoes.map(item =>
+        document.getElementById('listaResolucao').innerHTML = (t.resolucoes || []).map(item =>
             `<label class="check-item"><input type="checkbox" class="check-res" value="${escapeHtml(item)}" onchange="montarProcedimento()"><span>${escapeHtml(item)}</span></label>`
         ).join('');
         montarProcedimento();
@@ -1784,22 +1206,15 @@
         const rMarcadas = Array.from(document.querySelectorAll('.check-res:checked')).map(c => c.value);
         let texto = "";
         if (tMarcados.length > 0) texto += "TESTES E VALIDAÇÕES:\n" + tMarcados.map(t => " • " + t).join("\n");
-        if (rMarcadas.length > 0) {
-            if (texto) texto += "\n\n";
-            texto += "RESOLUÇÃO APLICADA:\n" + rMarcadas.map(r => " • " + r).join("\n");
-        }
+        if (rMarcadas.length > 0) { if (texto) texto += "\n\n"; texto += "RESOLUÇÃO APLICADA:\n" + rMarcadas.map(r => " • " + r).join("\n"); }
         document.getElementById('procedimento').value = texto;
         updateCopyBtn();
-        // Atualiza preview do script completo
         atualizarPreview();
     };
 
     window.debounceMontarScript = function () {
         clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-            atualizarPreview();
-            updateCopyBtn();
-        }, 250);
+        debounceTimer = setTimeout(() => { atualizarPreview(); updateCopyBtn(); }, 250);
     };
 
     function atualizarPreview() {
@@ -1809,41 +1224,18 @@
         const proc = document.getElementById('procedimento').value.trim();
         const obs = document.getElementById('observacoes').value.trim();
         const tipo = document.getElementById('tipoAtendimento').value;
-
-        if (!user && !prob) {
-            document.getElementById('procedimento').setAttribute('placeholder', 'Preencha os campos acima para gerar o script...');
-            return;
-        }
-
-        const fraseSucesso = tipo === "problema"
-            ? "o problema foi solucionado com sucesso"
-            : "a instalação foi concluída com sucesso";
-
-        const nomeUser = user || "...";
-        const nomeProb = prob || "...";
+        if (!user && !prob) return;
+        const fraseSucesso = tipo === "problema" ? "o problema foi solucionado com sucesso" : "a instalação foi concluída com sucesso";
         const procTexto = proc || "(Nenhum procedimento selecionado)";
         const obsTexto = obs ? `\nObservações: ${obs}\n` : '';
-
-        // Data/hora automática
-        const agora = new Date();
-        const dataStr = agora.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        const horaStr = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-
-        // Assinatura do técnico
-        const assinatura = tecnicoNome
-            ? `Equipe de Suporte Técnico\nTécnico: ${tecnicoNome}`
-            : `Equipe de Suporte Técnico`;
-
-        const script = `Prezado(a) ${nomeUser},\n\nComunicamos a conclusão do atendimento técnico referente à solicitação: "${nomeProb}".\nData do atendimento: ${dataStr} às ${horaStr}\n\nA seguir, apresentamos o relatório das ações executadas:\n\n${procTexto}${obsTexto ? '\n' + obsTexto : ''}\nDestacamos que ${fraseSucesso}, e o pleno funcionamento dos recursos foi testado e aprovado pelo(a) ${trat} ${nomeUser} no ato do atendimento.\n\nDiante da resolução, este chamado encontra-se formalmente encerrado em nosso sistema. Em caso de reincidência ou para novas solicitações, orientamos a abertura de um novo chamado, garantindo assim o registro e a conformidade do suporte prestado.\n\nAtenciosamente,\n${assinatura}.`;
-
+        const assinatura = tecnicoNome ? `Equipe de Suporte Técnico\nTécnico: ${tecnicoNome}` : `Equipe de Suporte Técnico`;
+        const script = `Prezado(a) ${user || "..."},\n\nComunicamos a conclusão do atendimento técnico referente à solicitação: "${prob || "..."}"\n\nA seguir, apresentamos o relatório das ações executadas:\n\n${procTexto}${obsTexto ? '\n' + obsTexto : ''}\nDestacamos que ${fraseSucesso}, e o pleno funcionamento dos recursos foi testado e aprovado pelo(a) ${trat} ${user || "..."} no ato do atendimento.\n\nDiante da resolução, este chamado encontra-se formalmente encerrado em nosso sistema. Em caso de reincidência ou para novas solicitações, orientamos a abertura de um novo chamado, garantindo assim o registro e a conformidade do suporte prestado.\n\nAtenciosamente,\n${assinatura}.`;
         document.getElementById('procedimento').value = script;
     }
 
     function updateCopyBtn() {
         const btn = document.getElementById('btnCopy');
-        const user = document.getElementById('usuario').value.trim();
-        const prob = document.getElementById('problema').value.trim();
-        btn.disabled = !user || !prob;
+        btn.disabled = !document.getElementById('usuario').value.trim() || !document.getElementById('problema').value.trim();
     }
 
     // ─── COPY & HISTORY ───────────────────────────────────────────────────────
@@ -1853,14 +1245,11 @@
         try {
             await navigator.clipboard.writeText(script);
             const btn = document.getElementById('btnCopy');
-            btn.innerText = '✓ Copiado!';
-            btn.classList.add('copied');
+            btn.innerText = '✓ Copiado!'; btn.classList.add('copied');
             setTimeout(() => { btn.innerText = 'Copiar Script'; btn.classList.remove('copied'); }, 2000);
             salvarNoHistorico(script);
             showToast('✅ Script copiado!', 'success');
-        } catch {
-            showToast('❌ Não foi possível copiar. Selecione e copie manualmente.', 'error');
-        }
+        } catch { showToast('❌ Não foi possível copiar.', 'error'); }
     };
 
     function salvarNoHistorico(script) {
@@ -1871,11 +1260,7 @@
             hist.unshift({ user, prob, script, date: new Date().toLocaleString('pt-BR') });
             if (hist.length > MAX_HISTORY) hist.splice(MAX_HISTORY);
             localStorage.setItem('suporte_history', JSON.stringify(hist));
-            // Increment counter
-            const count = parseInt(localStorage.getItem('suporte_count') || '0') + 1;
-            localStorage.setItem('suporte_count', String(count));
-            atualizarStatsBadge();
-        } catch { /* silently fail */ }
+        } catch {}
     }
 
     function renderHistory() {
@@ -1887,14 +1272,9 @@
                 return;
             }
             el.innerHTML = `<div class="history-list">${hist.map((item, i) =>
-                `<div class="history-item" onclick="copiarDoHistorico(${i})">
-                    <div class="history-item-title">${escapeHtml(item.prob)}</div>
-                    <div class="history-item-meta">${escapeHtml(item.user)} · ${item.date}</div>
-                </div>`
-            ).join('')}</div><p style="font-size:12px;color:var(--text-muted);margin-top:12px;text-align:center;">Clique em um item para copiar novamente</p>`;
-        } catch {
-            el.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><p>Erro ao carregar histórico.</p></div>`;
-        }
+                `<div class="history-item" onclick="copiarDoHistorico(${i})"><div class="history-item-title">${escapeHtml(item.prob)}</div><div class="history-item-meta">${escapeHtml(item.user)} · ${item.date}</div></div>`
+            ).join('')}</div><p style="font-size:12px;color:var(--text-muted);margin-top:12px;text-align:center;">Clique para copiar novamente</p>`;
+        } catch { el.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><p>Erro ao carregar histórico.</p></div>`; }
     }
 
     window.copiarDoHistorico = async function (i) {
@@ -1902,13 +1282,11 @@
             const hist = JSON.parse(localStorage.getItem('suporte_history') || '[]');
             await navigator.clipboard.writeText(hist[i].script);
             showToast('✅ Script copiado do histórico!', 'success');
-        } catch {
-            showToast('❌ Não foi possível copiar.', 'error');
-        }
+        } catch { showToast('❌ Não foi possível copiar.', 'error'); }
     };
 
     window.confirmarRestaurarPadroes = function () {
-        openModal('Restaurar modelos padrão', 'Isso irá <strong>adicionar</strong> os 30+ modelos padrão à sua lista (sem apagar os seus modelos personalizados). Deseja continuar?', async () => {
+        openModal('Restaurar modelos padrão', 'Os 35 modelos padrão serão <strong>adicionados</strong> sem apagar os personalizados.', async () => {
             templates = { ...DEFAULT_TEMPLATES, ...templates };
             renderMenus();
             await salvarNaNuvem();
@@ -1917,10 +1295,8 @@
     };
 
     window.confirmarLimparHistorico = function () {
-        openModal('Limpar histórico', 'Deseja apagar todo o histórico local de scripts e resetar o contador?', () => {
+        openModal('Limpar histórico', 'Deseja apagar todo o histórico local de scripts?', () => {
             localStorage.removeItem('suporte_history');
-            localStorage.removeItem('suporte_count');
-            atualizarStatsBadge();
             showToast('🗑 Histórico apagado.', 'info');
             renderHistory();
         });
@@ -1928,13 +1304,11 @@
 
     // ─── IMPORT / EXPORT ─────────────────────────────────────────────────────
     window.exportarTemplates = function () {
-        const json = JSON.stringify(templates, null, 2);
-        const blob = new Blob([json], { type: 'application/json' });
+        const blob = new Blob([JSON.stringify(templates, null, 2)], { type: 'application/json' });
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
         a.download = `suporte-backup-${new Date().toISOString().slice(0, 10)}.json`;
-        a.click();
-        URL.revokeObjectURL(a.href);
+        a.click(); URL.revokeObjectURL(a.href);
         showToast('📤 Backup exportado!', 'success');
     };
 
@@ -1946,12 +1320,9 @@
                 if (typeof imported !== 'object' || Array.isArray(imported)) throw new Error();
                 const count = Object.keys(imported).length;
                 templates = { ...templates, ...imported };
-                renderMenus();
-                await salvarNaNuvem();
-                showToast(`✅ ${count} modelos importados e sincronizados!`, 'success');
-            } catch {
-                showToast('❌ Arquivo inválido. Verifique o formato JSON.', 'error');
-            }
+                renderMenus(); await salvarNaNuvem();
+                showToast(`✅ ${count} modelos importados!`, 'success');
+            } catch { showToast('❌ Arquivo inválido.', 'error'); }
         };
         reader.readAsText(event.target.files[0]);
         event.target.value = '';
@@ -1959,15 +1330,11 @@
 
     // ─── CLEAR ────────────────────────────────────────────────────────────────
     window.limparCampos = function () {
-        document.getElementById('usuario').value = '';
-        document.getElementById('problema').value = '';
-        document.getElementById('observacoes').value = '';
-        document.getElementById('procedimento').value = '';
+        ['usuario','problema','observacoes','procedimento'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('templateSelect').value = '';
         document.getElementById('templateSearch').value = '';
         document.getElementById('btnClearSearch').style.display = 'none';
         document.getElementById('areaDinamica').style.display = 'none';
-        updateFavBtn();
         updateCopyBtn();
     };
 
@@ -1979,34 +1346,24 @@
         modalCallback = onConfirm;
         document.getElementById('confirmModal').classList.add('visible');
     };
-    window.closeModal = function () {
-        document.getElementById('confirmModal').classList.remove('visible');
-        modalCallback = null;
-    };
-    document.getElementById('modalConfirmBtn').addEventListener('click', () => {
-        if (modalCallback) modalCallback();
-        window.closeModal();
-    });
-    document.getElementById('confirmModal').addEventListener('click', function (e) {
-        if (e.target === this) window.closeModal();
-    });
+    window.closeModal = function () { document.getElementById('confirmModal').classList.remove('visible'); modalCallback = null; };
+    document.getElementById('modalConfirmBtn').addEventListener('click', () => { if (modalCallback) modalCallback(); window.closeModal(); });
+    document.getElementById('confirmModal').addEventListener('click', function (e) { if (e.target === this) window.closeModal(); });
 
     // ─── TOAST ────────────────────────────────────────────────────────────────
     window.showToast = function (msg, type = 'info') {
-        const container = document.getElementById('toastContainer');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerText = msg;
-        container.appendChild(toast);
-        setTimeout(() => toast.remove(), 2900);
+        const t = document.createElement('div');
+        t.className = `toast ${type}`; t.innerText = msg;
+        document.getElementById('toastContainer').appendChild(t);
+        setTimeout(() => t.remove(), 2900);
     };
 
     // ─── UTILS ────────────────────────────────────────────────────────────────
     function escapeHtml(str) {
-        return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        if (!str) return '';
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
-    // Prevent context menu
     document.addEventListener('contextmenu', e => e.preventDefault());
 </script>
 </body>
