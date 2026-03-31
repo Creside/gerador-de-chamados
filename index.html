@@ -535,6 +535,127 @@
             margin: 20px 0;
         }
 
+        /* ─── CATEGORY FILTER ─── */
+        .category-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+        }
+        .cat-chip {
+            font-size: 11px;
+            font-family: var(--font-mono);
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            background: var(--bg-input);
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all var(--transition);
+            white-space: nowrap;
+            user-select: none;
+        }
+        .cat-chip:hover { border-color: #3a3a42; color: var(--text-secondary); }
+        .cat-chip.active {
+            background: var(--accent-blue-dim);
+            border-color: rgba(79,158,255,0.4);
+            color: var(--accent-blue);
+        }
+
+        /* ─── SEARCH BOX ─── */
+        .search-wrap { position: relative; margin-top: 6px; }
+        .search-wrap input {
+            padding-left: 34px;
+        }
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 13px;
+            pointer-events: none;
+        }
+        .search-wrap .clear-search {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 2px 4px;
+            display: none;
+        }
+        .search-wrap .clear-search:hover { color: var(--text-secondary); }
+
+        /* ─── FAVORITES ─── */
+        .template-row {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            margin-top: 6px;
+        }
+        .template-row select { margin-top: 0; flex: 1; }
+        .btn-fav {
+            flex-shrink: 0;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            font-size: 16px;
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: all var(--transition);
+            line-height: 1;
+        }
+        .btn-fav:hover { background: var(--bg-hover); color: var(--accent-yellow); }
+        .btn-fav.is-fav { color: var(--accent-yellow); background: rgba(245,200,66,0.1); border-color: rgba(245,200,66,0.25); }
+
+        /* ─── STATS BADGE ─── */
+        .stats-badge {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 3px 9px;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+
+        /* ─── TECHNICIAN ─── */
+        .tecnico-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 6px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+        .tecnico-section:hover { border-color: rgba(79,158,255,0.3); }
+        .tecnico-icon { font-size: 14px; flex-shrink: 0; }
+        .tecnico-name { font-size: 13px; color: var(--text-secondary); flex: 1; }
+        .tecnico-name.set { color: var(--text-primary); }
+        .tecnico-edit-hint { font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); }
+
+        /* ─── NO RESULTS ─── */
+        .no-results {
+            text-align: center;
+            padding: 14px;
+            color: var(--text-muted);
+            font-size: 12px;
+            font-style: italic;
+        }
+
         @media (max-width: 500px) {
             body { padding: 12px 10px 40px; }
             .container { padding: 18px; border-radius: 12px; }
@@ -583,7 +704,7 @@
     <!-- MAIN SCREEN -->
     <div class="screen" id="mainScreen">
         <div class="page-header">
-            <div class="page-title">Scripts Gerador</div>
+            <div class="page-title">Scripts Gerador <span class="stats-badge" id="statsBadge">0 scripts</span></div>
             <div class="header-actions">
                 <button class="btn-icon" onclick="showHistory()">📋 Histórico</button>
                 <button class="btn-icon" onclick="showSettings()">⚙ Config</button>
@@ -591,7 +712,14 @@
             </div>
         </div>
 
-        <div class="inline-row">
+        <!-- Técnico responsável -->
+        <div class="tecnico-section" onclick="editarTecnico()">
+            <span class="tecnico-icon">👤</span>
+            <span class="tecnico-name" id="tecnicoDisplay">Definir técnico responsável...</span>
+            <span class="tecnico-edit-hint">editar</span>
+        </div>
+
+        <div class="inline-row" style="margin-top:16px;">
             <div class="tratamento-wrap">
                 <label>Trat.</label>
                 <select id="tratamento">
@@ -617,10 +745,23 @@
         <label>Observações Adicionais</label>
         <textarea id="observacoes" rows="2" placeholder="Informações extras que devem constar no script final..." oninput="debounceMontarScript()"></textarea>
 
-        <label>Modelo Rápido</label>
-        <select id="templateSelect" onchange="carregarCamposDinamicos()">
-            <option value="">-- Selecionar Modelo --</option>
-        </select>
+        <!-- Modelo: categoria + busca + select + favorito -->
+        <label style="margin-top:16px;">Modelo Rápido</label>
+
+        <div class="category-filter" id="categoryFilter"></div>
+
+        <div class="search-wrap" style="margin-top:8px;">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="templateSearch" placeholder="Buscar modelo..." oninput="filtrarModelos()">
+            <button class="clear-search" id="btnClearSearch" onclick="limparBusca()">✕</button>
+        </div>
+
+        <div class="template-row">
+            <select id="templateSelect" onchange="carregarCamposDinamicos()">
+                <option value="">-- Selecionar Modelo --</option>
+            </select>
+            <button class="btn-fav" id="btnFav" onclick="toggleFavorito()" title="Favoritar modelo">☆</button>
+        </div>
         <div id="templateEmptyHint"></div>
 
         <div id="areaDinamica" class="checklist-container">
@@ -727,12 +868,20 @@
     let editingKey = null;
     let currentUser = null;
     let debounceTimer = null;
+    let favorites = [];
+    let activeCat = 'Todos';
+    let tecnicoNome = '';
     const MAX_HISTORY = 30;
 
     // ─── AUTH ──────────────────────────────────────────────────────────────────
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             currentUser = user;
+            // Load local prefs
+            favorites = JSON.parse(localStorage.getItem('suporte_favs') || '[]');
+            tecnicoNome = localStorage.getItem('suporte_tecnico') || '';
+            atualizarDisplayTecnico();
+            atualizarStatsBadge();
             showScreen('loginScreen', false);
             showScreen('appScreen', true);
             showMain();
@@ -1375,25 +1524,164 @@
     };
 
     // ─── TEMPLATES ────────────────────────────────────────────────────────────
+    function getCategories() {
+        const cats = new Set();
+        Object.keys(templates).forEach(name => {
+            const m = name.match(/^(.+?) —/);
+            if (m) cats.add(m[1].trim());
+            else cats.add('Outros');
+        });
+        return ['Todos', '⭐ Favoritos', ...Array.from(cats)];
+    }
+
+    function renderCategoryFilter() {
+        const cats = getCategories();
+        const el = document.getElementById('categoryFilter');
+        el.innerHTML = cats.map(cat =>
+            `<span class="cat-chip${cat === activeCat ? ' active' : ''}" onclick="setCat(${JSON.stringify(cat)})">${cat}</span>`
+        ).join('');
+    }
+
+    window.setCat = function(cat) {
+        activeCat = cat;
+        renderCategoryFilter();
+        document.getElementById('templateSearch').value = '';
+        document.getElementById('btnClearSearch').style.display = 'none';
+        populateTemplateSelect();
+    };
+
+    function getFilteredKeys() {
+        const search = (document.getElementById('templateSearch')?.value || '').toLowerCase().trim();
+        return Object.keys(templates).filter(name => {
+            const catMatch = activeCat === 'Todos'
+                ? true
+                : activeCat === '⭐ Favoritos'
+                    ? favorites.includes(name)
+                    : name.startsWith(activeCat);
+            const searchMatch = !search || name.toLowerCase().includes(search);
+            return catMatch && searchMatch;
+        }).sort((a, b) => {
+            // Favorites first within any filter
+            const aFav = favorites.includes(a) ? 0 : 1;
+            const bFav = favorites.includes(b) ? 0 : 1;
+            return aFav - bFav || a.localeCompare(b);
+        });
+    }
+
+    function populateTemplateSelect() {
+        const keys = getFilteredKeys();
+        const sel = document.getElementById('templateSelect');
+        const hint = document.getElementById('templateEmptyHint');
+        if (keys.length === 0) {
+            sel.innerHTML = '<option value="">-- Nenhum resultado --</option>';
+            hint.innerHTML = `<div class="no-results">Nenhum modelo encontrado para este filtro.</div>`;
+        } else {
+            sel.innerHTML = '<option value="">-- Selecionar Modelo --</option>' +
+                keys.map(l => {
+                    const star = favorites.includes(l) ? '⭐ ' : '';
+                    return `<option value="${escapeHtml(l)}">${star}${escapeHtml(l)}</option>`;
+                }).join('');
+            hint.innerHTML = '';
+        }
+        updateFavBtn();
+    }
+
     function renderMenus() {
         const keys = Object.keys(templates);
-        const selectApp = document.getElementById('templateSelect');
-        const selectManage = document.getElementById('manageSelect');
         const hint = document.getElementById('templateEmptyHint');
 
         if (keys.length === 0) {
-            selectApp.innerHTML = '<option value="">-- Nenhum modelo cadastrado --</option>';
+            document.getElementById('templateSelect').innerHTML = '<option value="">-- Nenhum modelo cadastrado --</option>';
             hint.innerHTML = `<div class="empty-state"><div class="empty-icon">📂</div><p>Você ainda não tem modelos.<br><strong>Vá em Configurações → Cadastrar Novo Procedimento</strong> para criar o primeiro.</p></div>`;
+            document.getElementById('categoryFilter').innerHTML = '';
         } else {
-            selectApp.innerHTML = '<option value="">-- Selecionar Modelo --</option>' +
-                keys.map(l => `<option value="${l}">${l}</option>`).join('');
             hint.innerHTML = '';
+            renderCategoryFilter();
+            populateTemplateSelect();
         }
 
+        // Manage select (settings)
+        const selectManage = document.getElementById('manageSelect');
         selectManage.innerHTML = '<option value="">-- Escolha para Editar/Excluir --</option>' +
-            keys.map(l => `<option value="${l}">${l}</option>`).join('');
-
+            keys.map(l => `<option value="${escapeHtml(l)}">${escapeHtml(l)}</option>`).join('');
         toggleEditControls();
+    }
+
+    window.filtrarModelos = function() {
+        const val = document.getElementById('templateSearch').value;
+        document.getElementById('btnClearSearch').style.display = val ? 'block' : 'none';
+        populateTemplateSelect();
+    };
+
+    window.limparBusca = function() {
+        document.getElementById('templateSearch').value = '';
+        document.getElementById('btnClearSearch').style.display = 'none';
+        populateTemplateSelect();
+    };
+
+    // ─── FAVORITES ────────────────────────────────────────────────────────────
+    function updateFavBtn() {
+        const sel = document.getElementById('templateSelect').value;
+        const btn = document.getElementById('btnFav');
+        if (!sel) { btn.textContent = '☆'; btn.classList.remove('is-fav'); return; }
+        const isFav = favorites.includes(sel);
+        btn.textContent = isFav ? '★' : '☆';
+        btn.classList.toggle('is-fav', isFav);
+    }
+
+    window.toggleFavorito = function() {
+        const sel = document.getElementById('templateSelect').value;
+        if (!sel) { showToast('⚠️ Selecione um modelo primeiro.', 'info'); return; }
+        const idx = favorites.indexOf(sel);
+        if (idx === -1) {
+            favorites.unshift(sel);
+            showToast('⭐ Adicionado aos favoritos!', 'success');
+        } else {
+            favorites.splice(idx, 1);
+            showToast('Removido dos favoritos.', 'info');
+        }
+        localStorage.setItem('suporte_favs', JSON.stringify(favorites));
+        renderCategoryFilter();
+        populateTemplateSelect();
+        // Re-select the same model
+        document.getElementById('templateSelect').value = sel;
+        updateFavBtn();
+    };
+
+    // ─── TECHNICIAN ───────────────────────────────────────────────────────────
+    function atualizarDisplayTecnico() {
+        const el = document.getElementById('tecnicoDisplay');
+        if (!el) return;
+        if (tecnicoNome) {
+            el.textContent = tecnicoNome;
+            el.classList.add('set');
+        } else {
+            el.textContent = 'Definir técnico responsável...';
+            el.classList.remove('set');
+        }
+    }
+
+    window.editarTecnico = function() {
+        openModal(
+            'Técnico responsável',
+            `<input type="text" id="tecnicoInput" value="${escapeHtml(tecnicoNome)}" placeholder="Seu nome completo" style="width:100%;padding:10px 12px;margin-top:8px;border:1px solid var(--border);border-radius:6px;background:var(--bg-input);color:var(--text-primary);font-size:14px;font-family:var(--font-sans);">`,
+            () => {
+                const val = document.getElementById('tecnicoInput')?.value.trim() || '';
+                tecnicoNome = val;
+                localStorage.setItem('suporte_tecnico', tecnicoNome);
+                atualizarDisplayTecnico();
+                debounceMontarScript();
+                showToast('✅ Técnico salvo!', 'success');
+            }
+        );
+        setTimeout(() => document.getElementById('tecnicoInput')?.focus(), 100);
+    };
+
+    // ─── STATS ────────────────────────────────────────────────────────────────
+    function atualizarStatsBadge() {
+        const count = parseInt(localStorage.getItem('suporte_count') || '0');
+        const el = document.getElementById('statsBadge');
+        if (el) el.textContent = `${count} script${count !== 1 ? 's' : ''}`;
     }
 
     window.toggleEditControls = function () {
@@ -1478,6 +1766,7 @@
     window.carregarCamposDinamicos = function () {
         const sel = document.getElementById('templateSelect').value;
         const area = document.getElementById('areaDinamica');
+        updateFavBtn();
         if (!sel) { area.style.display = 'none'; updateCopyBtn(); return; }
         area.style.display = 'block';
         const t = templates[sel];
@@ -1535,7 +1824,17 @@
         const procTexto = proc || "(Nenhum procedimento selecionado)";
         const obsTexto = obs ? `\nObservações: ${obs}\n` : '';
 
-        const script = `Prezado(a) ${nomeUser},\n\nComunicamos a conclusão do atendimento técnico referente à solicitação: "${nomeProb}".\n\nA seguir, apresentamos o relatório das ações executadas:\n\n${procTexto}${obsTexto ? '\n' + obsTexto : ''}\nDestacamos que ${fraseSucesso}, e o pleno funcionamento dos recursos foi testado e aprovado pelo(a) ${trat} ${nomeUser} no ato do atendimento.\n\nDiante da resolução, este chamado encontra-se formalmente encerrado em nosso sistema. Em caso de reincidência ou para novas solicitações, orientamos a abertura de um novo chamado, garantindo assim o registro e a conformidade do suporte prestado.\n\nAtenciosamente,\nEquipe de Suporte Técnico.`;
+        // Data/hora automática
+        const agora = new Date();
+        const dataStr = agora.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const horaStr = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+        // Assinatura do técnico
+        const assinatura = tecnicoNome
+            ? `Equipe de Suporte Técnico\nTécnico: ${tecnicoNome}`
+            : `Equipe de Suporte Técnico`;
+
+        const script = `Prezado(a) ${nomeUser},\n\nComunicamos a conclusão do atendimento técnico referente à solicitação: "${nomeProb}".\nData do atendimento: ${dataStr} às ${horaStr}\n\nA seguir, apresentamos o relatório das ações executadas:\n\n${procTexto}${obsTexto ? '\n' + obsTexto : ''}\nDestacamos que ${fraseSucesso}, e o pleno funcionamento dos recursos foi testado e aprovado pelo(a) ${trat} ${nomeUser} no ato do atendimento.\n\nDiante da resolução, este chamado encontra-se formalmente encerrado em nosso sistema. Em caso de reincidência ou para novas solicitações, orientamos a abertura de um novo chamado, garantindo assim o registro e a conformidade do suporte prestado.\n\nAtenciosamente,\n${assinatura}.`;
 
         document.getElementById('procedimento').value = script;
     }
@@ -1572,6 +1871,10 @@
             hist.unshift({ user, prob, script, date: new Date().toLocaleString('pt-BR') });
             if (hist.length > MAX_HISTORY) hist.splice(MAX_HISTORY);
             localStorage.setItem('suporte_history', JSON.stringify(hist));
+            // Increment counter
+            const count = parseInt(localStorage.getItem('suporte_count') || '0') + 1;
+            localStorage.setItem('suporte_count', String(count));
+            atualizarStatsBadge();
         } catch { /* silently fail */ }
     }
 
@@ -1614,8 +1917,10 @@
     };
 
     window.confirmarLimparHistorico = function () {
-        openModal('Limpar histórico', 'Deseja apagar todo o histórico local de scripts?', () => {
+        openModal('Limpar histórico', 'Deseja apagar todo o histórico local de scripts e resetar o contador?', () => {
             localStorage.removeItem('suporte_history');
+            localStorage.removeItem('suporte_count');
+            atualizarStatsBadge();
             showToast('🗑 Histórico apagado.', 'info');
             renderHistory();
         });
@@ -1659,7 +1964,10 @@
         document.getElementById('observacoes').value = '';
         document.getElementById('procedimento').value = '';
         document.getElementById('templateSelect').value = '';
+        document.getElementById('templateSearch').value = '';
+        document.getElementById('btnClearSearch').style.display = 'none';
         document.getElementById('areaDinamica').style.display = 'none';
+        updateFavBtn();
         updateCopyBtn();
     };
 
