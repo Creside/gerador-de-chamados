@@ -976,7 +976,16 @@
             const docRef = doc(db, "userData", currentUser.uid);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists() && docSnap.data().templates && Object.keys(docSnap.data().templates).length > 0) {
-                templates = docSnap.data().templates;
+                const saved = docSnap.data().templates;
+                // Auto-migrate: if the saved templates are mostly old format (no category keywords),
+                // replace with defaults automatically so filters always work
+                if (needsMigration(saved)) {
+                    templates = { ...DEFAULT_TEMPLATES };
+                    await setDoc(docRef, { templates }, { merge: true });
+                    showToast('🔄 Modelos atualizados para o novo formato!', 'info');
+                } else {
+                    templates = saved;
+                }
             } else {
                 templates = { ...DEFAULT_TEMPLATES };
                 await setDoc(docRef, { templates }, { merge: true });
@@ -1044,28 +1053,34 @@
     // ─── CATEGORY FILTER ──────────────────────────────────────────────────────
     // Categorias fixas com palavras-chave — ignora emoji, agrupa por nome
     const CAT_MAP = [
-        { label: '💻 TI',          keyword: 'TI'          },
-        { label: '🌐 Rede',        keyword: 'Rede'        },
-        { label: '🖨️ Impressora',  keyword: 'Impressora'  },
-        { label: '🖱️ Periférico',  keyword: 'Periférico'  },
-        { label: '⚙️ Sistema',     keyword: 'Sistema'     },
-        { label: '🔧 Instalação',  keyword: 'Instalação'  },
-        { label: '🔄 Manutenção',  keyword: 'Manutenção'  },
+        { label: '💻 TI',         keyword: 'TI'         },
+        { label: '🌐 Rede',       keyword: 'Rede'       },
+        { label: '🖨️ Impressora', keyword: 'Impressora' },
+        { label: '🖱️ Periférico', keyword: 'Periférico' },
+        { label: '⚙️ Sistema',    keyword: 'Sistema'    },
+        { label: '🔧 Instalação', keyword: 'Instalação' },
+        { label: '🔄 Manutenção', keyword: 'Manutenção' },
     ];
 
     function getCatForName(name) {
-        // Extract the word(s) between emoji and " — "
-        // e.g. "💻 TI — Computador" → "TI"
-        // e.g. "🖱️ Periférico — Mouse" → "Periférico"
-        const part = name.split(' — ')[0];          // "💻 TI" or "🖱️ Periférico"
-        // strip leading emoji+space: keep only letters/accents
-        const word = part.replace(/^[\p{Emoji}\s]+/u, '').trim();
-        const found = CAT_MAP.find(c => word.startsWith(c.keyword));
+        // Split on " — " and take left part, then search for keyword anywhere in it
+        // This avoids any emoji parsing issues entirely
+        const left = name.includes(' — ') ? name.split(' — ')[0] : name;
+        const found = CAT_MAP.find(c => left.indexOf(c.keyword) !== -1);
         return found ? found.label : 'Outros';
     }
 
+    function needsMigration(tpls) {
+        // Returns true if any template name doesn't match our category keywords
+        // i.e. the old templates without icons/format are still there
+        const keys = Object.keys(tpls);
+        if (keys.length === 0) return false;
+        const recognized = keys.filter(n => CAT_MAP.some(c => n.indexOf(c.keyword) !== -1));
+        // If less than half the templates are recognized, needs migration
+        return recognized.length < keys.length / 2;
+    }
+
     function getCats() {
-        // Only show categories that actually have templates
         const used = new Set(Object.keys(templates).map(getCatForName));
         const ordered = ['Todos', ...CAT_MAP.map(c => c.label).filter(l => used.has(l))];
         if (used.has('Outros')) ordered.push('Outros');
