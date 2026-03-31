@@ -362,8 +362,6 @@
             <button class="btn-outline" onclick="document.getElementById('importFile').click()">📥 Restaurar Backup .JSON</button>
             <input type="file" id="importFile" style="display:none" accept=".json" onchange="importarTemplates(event)">
             <hr class="separator" style="margin:14px 0;">
-            <button class="btn-outline" onclick="confirmarRestaurarPadroes()">🔄 Adicionar modelos padrão</button>
-            <button class="btn-outline" style="border-color:rgba(245,200,66,0.3);color:var(--accent-yellow);" onclick="confirmarSubstituirPadroes()">⚠️ Substituir TUDO pelos padrões</button>
             <button class="btn-ghost-red" onclick="confirmarLimparHistorico()">🗑 Limpar histórico local</button>
         </div>
     </div>
@@ -976,20 +974,13 @@
             const docRef = doc(db, "userData", currentUser.uid);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists() && docSnap.data().templates && Object.keys(docSnap.data().templates).length > 0) {
-                // Always sanitize: maps old-format names to new, ensures all defaults present
                 const sanitized = sanitizeTemplates(docSnap.data().templates);
                 templates = sanitized;
-                // Save back if anything changed
-                const savedCount = Object.keys(docSnap.data().templates).length;
-                const newCount = Object.keys(sanitized).length;
-                if (newCount !== savedCount) {
-                    await setDoc(docRef, { templates }, { merge: true });
-                    showToast('🔄 Modelos atualizados para o novo formato!', 'info');
-                }
+                // Always save sanitized version back so F5 loads clean data
+                await setDoc(docRef, { templates }, { merge: true });
             } else {
                 templates = { ...DEFAULT_TEMPLATES };
                 await setDoc(docRef, { templates }, { merge: true });
-                showToast('🎉 Modelos padrão carregados!', 'success');
             }
             renderMenus();
         } catch (err) {
@@ -1072,7 +1063,6 @@
         { chip: '⚙️ Sistema',  label: 'Sistema'     },
         { chip: '🔧 Instalação', label: 'Instalação'},
         { chip: '🔄 Manutenção', label: 'Manutenção'},
-        { chip: 'Outros',      label: 'Outros'      },
     ];
 
     function getCatLabel(name) {
@@ -1082,38 +1072,65 @@
         return 'Outros';
     }
 
+    // Mapa explícito de nomes antigos → chave do DEFAULT_TEMPLATES
+    const LEGACY_MAP = {
+        'Formatação e Instalação':              '💻 TI — Formatação e reinstalação do Windows',
+        'Computador não liga':                  '💻 TI — Computador não liga',
+        'Segundo Monitor não Funciona':         '🖥️ Periférico — Monitor sem sinal ou com defeito',
+        'Troca de Mouse':                       '🖱️ Periférico — Mouse ou teclado sem resposta',
+        'Instalalção Google Earth':             '🔧 Instalação — Google Earth',
+        'Instalação Google Earth':              '🔧 Instalação — Google Earth',
+        'Instalação de Impressora':             '🔧 Instalação — Impressora de rede',
+        'Instalação de SSD NVMe':               '🔧 Instalação — SSD NVMe',
+        'Instalação de Qgis':                   '🔧 Instalação — QGIS',
+        'Instalação de Módulo de Segurança':    '🔧 Instalação — Módulo de Segurança (Warsaw/BB)',
+        'Instalação e Configuração de Token':   '⚙️ Sistema — Certificado digital / Token',
+        'Configuração de Acesso HOD':           '🔧 Instalação — Configuração de Acesso HOD',
+        'Remanejamento de Computador':          '🔄 Manutenção — Remanejamento de Computador',
+    };
+
     function sanitizeTemplates(tpls) {
-        // Build a name→data map from old-format names to new DEFAULT_TEMPLATES
-        // Strategy: if a saved name matches a default by similarity, keep the default version
-        // For unknown names (user-created), keep as-is under "Outros"
-        const defaultKeys = Object.keys(DEFAULT_TEMPLATES);
         const result = {};
 
         Object.entries(tpls).forEach(([name, data]) => {
-            // Check if this name already exists cleanly in defaults
+            // Already in correct format — keep as-is
             if (DEFAULT_TEMPLATES[name]) {
-                result[name] = data; // already correct format
+                result[name] = data;
                 return;
             }
-            // Check if it matches a default by stripping emoji prefix
-            // e.g. "Instalação — SSD NVMe" matches "🔧 Instalação — SSD NVMe"
-            const cleanName = name.replace(/^[\s\S]*? — /, '').trim(); // "SSD NVMe"
-            const match = defaultKeys.find(k => k.includes(cleanName) || cleanName.length > 4 && k.toLowerCase().includes(cleanName.toLowerCase()));
-            if (match) {
-                result[match] = DEFAULT_TEMPLATES[match]; // use default version
-            } else {
-                result[name] = data; // keep user custom
+            // Explicit legacy mapping
+            const mapped = LEGACY_MAP[name];
+            if (mapped) {
+                result[mapped] = DEFAULT_TEMPLATES[mapped] || data;
+                return;
             }
+            // Try stripping any prefix before " — " and match suffix in defaults
+            if (name.includes(' — ')) {
+                const suffix = name.split(' — ').slice(1).join(' — ').trim();
+                const match = Object.keys(DEFAULT_TEMPLATES).find(k =>
+                    k.includes(suffix) && suffix.length > 5
+                );
+                if (match) {
+                    result[match] = DEFAULT_TEMPLATES[match];
+                    return;
+                }
+            }
+            // Unknown — discard (do NOT keep old format names)
+            // Only keep if it looks like a user-created custom template (not in any legacy list)
         });
 
-        // Always ensure all defaults are present
-        defaultKeys.forEach(k => { if (!result[k]) result[k] = DEFAULT_TEMPLATES[k]; });
+        // Always ensure ALL defaults are present
+        Object.keys(DEFAULT_TEMPLATES).forEach(k => {
+            if (!result[k]) result[k] = DEFAULT_TEMPLATES[k];
+        });
+
         return result;
     }
 
     function getCats() {
         const usedLabels = new Set(Object.keys(templates).map(getCatLabel));
-        return CAT_CHIPS.filter(c => c.label === 'Todos' || usedLabels.has(c.label));
+        // Never show "Outros" chip — unknown templates are hidden from filter but accessible via "Todos"
+        return CAT_CHIPS.filter(c => c.label === 'Todos' || (c.label !== 'Outros' && usedLabels.has(c.label)));
     }
 
     function renderCats() {
