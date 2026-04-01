@@ -924,6 +924,21 @@
                 "Reemparelhamento do receptor sem fio",
                 "Substituição do periférico com defeito"
             ]
+        },
+        "⚙️ Sistema — Alteração de Senha / Desbloqueio de Conta (ColaboraGOV)": {
+            testes: [
+                "Verificação se o usuário lembra a senha antiga (necessária para troca pelo portal)",
+                "Verificação do formato correto do login: domínio\\nome.sobrenome (ex: MGI\\nome.sobrenome)",
+                "Acesso ao portal https://trocasenha.colaboragov.gov.br para confirmar disponibilidade",
+                "Verificação se a conta está bloqueada ou apenas com senha expirada",
+                "Confirmação de quais sistemas serão impactados (SEI, Rede, E-mail, Citsmart, ADS)"
+            ],
+            resolucoes: [
+                "Acesso ao portal https://trocasenha.colaboragov.gov.br e preenchimento: domínio\\nome.sobrenome, senha antiga, nova senha e confirmação",
+                "Nova senha cadastrada e sincronizada com sucesso nos sistemas SEI, e-mail e perfil de rede",
+                "Em caso de bloqueio: abertura de chamado no Citsmart via atividade 'Reiniciar ou desbloquear senha - Automação'",
+                "Em caso de bloqueio sem acesso ao Citsmart: orientação para contato com a Central ColaboraGov (0800-941-9911)"
+            ]
         }
     };
 
