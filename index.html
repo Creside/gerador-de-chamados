@@ -809,17 +809,19 @@
                 "Reconfiguração de e-mail, impressoras e atalhos no novo perfil"
             ]
         },
-        "🔧 Instalação — Configuração de Acesso HOD": {
+        "🔧 Instalação — Configuração de Acesso HOD SERPRO": {
             testes: [
-                "Confirmação da instalação e versão do Java Runtime Environment (JRE) compatível com HOD",
-                "Inclusão da URL do servidor HOD na lista de exceções de segurança do Java",
-                "Configuração de permissões no navegador para execução de applets ou Java Web Start (.jnlp)",
-                "Limpeza do cache Java para garantir carregamento da versão mais recente do sistema",
-                "Criação de atalho na área de trabalho para acesso direto"
+                "Verificação se o Java (JRE) está instalado — versão mínima recomendada: Java 8",
+                "Acesso ao site https://hod.serpro.gov.br/a83016cv/ para confirmar disponibilidade do portal",
+                "Verificação de credenciais de login do usuário para o sistema HOD",
+                "Confirmação de conectividade com a internet e acesso liberado ao domínio serpro.gov.br"
             ],
             resolucoes: [
-                "Acesso HOD configurado com sucesso",
-                "Sessão de terminal aberta sem erros de segurança ou bloqueios de Java, validada com o usuário"
+                "Download e instalação do Java via https://www.java.com/pt-BR/download/ executando como administrador",
+                "Acesso ao portal https://hod.serpro.gov.br/a83016cv/ com login e senha do usuário — geração automática do arquivo hodcivws.jsp",
+                "Abertura do arquivo hodcivws.jsp com o programa javaws: botão direito → Abrir com → Mais aplicativos → Procurar outro aplicativo → localizar pasta C:\\Program Files\\Java\\jreX.X\\bin\\javaws",
+                "Confirmação da execução da aplicação IBM Host On-Demand clicando em Executar na janela de segurança",
+                "Acesso ao Painel de Controle HOD validado com abertura da sessão Terminal 3270 / SIAPE"
             ]
         },
         "🔧 Instalação — Google Earth": {
@@ -1100,7 +1102,7 @@
         'Instalação de Qgis':                   '🔧 Instalação — QGIS',
         'Instalação de Módulo de Segurança':    '🔧 Instalação — Módulo de Segurança (Warsaw/BB)',
         'Instalação e Configuração de Token':   '⚙️ Sistema — Certificado digital / Token',
-        'Configuração de Acesso HOD':           '🔧 Instalação — Configuração de Acesso HOD',
+        'Configuração de Acesso HOD':           '🔧 Instalação — Configuração de Acesso HOD SERPRO',
         'Remanejamento de Computador':          '🔄 Manutenção — Remanejamento de Computador',
     };
 
